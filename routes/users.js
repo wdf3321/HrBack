@@ -27,7 +27,10 @@ router.post('/login', content('application/json'), auth.login, login)
 router.delete('/logout', auth.jwt, logout)
 // 更新 token
 router.patch('/extend', auth.jwt, extend)
-router.get('/me', auth.jwt, getUser) // 獲取使用者
+// 獲取使用者
+router.get('/me', auth.jwt, getUser)
+
+// ------------------admin------------------
 router.get('/all', auth.jwt, getAllUser) // 獲取全部使用者
 router.delete('/delete/:id', auth.jwt, admin, deleteUser)
 router.get('/allvacation', auth.jwt, findAllUserVacation)
