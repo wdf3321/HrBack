@@ -31,7 +31,7 @@ router.patch('/extend', auth.jwt, extend)
 router.get('/me', auth.jwt, getUser)
 
 // ------------------admin------------------
-router.get('/all', auth.jwt, getAllUser) // 獲取全部使用者
+router.get('/all', auth.jwt, admin, getAllUser) // 獲取全部使用者
 router.delete('/delete/:id', auth.jwt, admin, deleteUser)
 router.get('/allvacation', auth.jwt, findAllUserVacation)
 router.get('/vacation/:name', auth.jwt, findUserVacation)
