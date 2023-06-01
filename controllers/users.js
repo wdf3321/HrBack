@@ -33,9 +33,7 @@ export const login = async (req, res) => {
         _id: req.user._id,
         token,
         name: req.user.name,
-        // account: req.user.account,
-        phone: req.user.phone,
-        // cart: req.user.cart.reduce((total, current) => total + current.quantity, 0),
+        number: req.user.number,
         role: req.user.role
       }
     })
@@ -74,8 +72,7 @@ export const getUser = (req, res) => {
       message: '',
       result: {
         name: req.user.name,
-        // account: req.user.account,
-        phone: req.user.phone,
+        number: req.user.number,
         role: req.user.role
       }
     })
@@ -86,8 +83,7 @@ export const getUser = (req, res) => {
 export const editUser = async (req, res) => {
   try {
     const data = {
-      // account: req.body.account,
-      phone: req.body.phone,
+      number: req.user.number,
       name: req.body.name,
       password: req.body.password
     }
