@@ -4,9 +4,11 @@ import bcrypt from 'bcrypt'
 
 const schema = new Schema(
   {
+    // 名字
     name: {
       type: String
     },
+    // 工號
     number: {
       type: String,
       reqired: [true, '缺少帳號'],

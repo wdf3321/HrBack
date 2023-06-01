@@ -8,12 +8,12 @@ import users from '../models/users.js'
 passport.use('login', new passportLocal.Strategy({
   // 預設帳密欄位是 username 和 password
   // 修改成 account 和 password
-  usernameField: 'account',
+  usernameField: 'number',
   passwordField: 'password'
-}, async (account, password, done) => {
+}, async (number, password, done) => {
   // done(錯誤, 傳到下一步的資料, 傳到下一步 info 的內容)
   try {
-    const user = await users.findOne({ account })
+    const user = await users.findOne({ number })
     if (!user) {
       return done(null, false, { message: '帳號不存在' })
     }
