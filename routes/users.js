@@ -42,7 +42,7 @@ router.get('/vacation/:number', auth.jwt, findUserVacation)
 // 創立打卡紀錄
 router.post('/vacation/on', auth.jwt, createVacation)// 上班
 router.patch('/vacation/off', auth.jwt, offVacation)// 下班
-// 查自己打卡紀錄
+// 查自己,某人打卡紀錄
 router.get('/:number', auth.jwt, findVacation)
 // 更改打卡已審核未審核
 router.patch('/vacation/check', auth.jwt, checkVacation)
