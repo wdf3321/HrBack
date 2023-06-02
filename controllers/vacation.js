@@ -1,13 +1,16 @@
-import users from '../models/users.js'
-import vacations from '../models/vacations.js'
+// import users from '../models/users.js'
+import vacations from '../models/userPunchrecords.js'
 
 export const createVacation = async (req, res) => {
   try {
     const result = vacations.create({
       name: req.body.name,
-      startDate: req.body.onClockIn,
-      endDate: req.body.onClockOut,
-      state: req.body.state
+      number: req.body.number,
+      date: req.body.date,
+      onClockIn: req.body.onClockIn,
+      onClockOut: req.body.onClockOut,
+      state: req.body.state,
+      hours: req.body.hours
     })
     res.status(200).json({ success: true, message: result })
   } catch (error) {
@@ -20,21 +23,21 @@ export const createVacation = async (req, res) => {
 }
 
 export const findVacation = async (req, res) => {
-  const result = await users.findById({ _id: req.user.id }).populate('vacation')
+  const result = await vacations.find({ number: req.user.number })
   res.status(200).json({ success: true, message: '', result })
 }
 
-export const deleteVacation = async (req, res) => {
-  try {
-    const user = await users.findOne({ account: req.user.account })
-    const vacation = users.vacation._id(req.params._id)
-    vacation.remove()
-    await user.save()
-    res.status(200).json({ success: true, message: 'Vacation deleted successfully' })
-  } catch (error) {
-    res.status(500).json({ success: false, message: 'Unable to delete vacation' })
-  }
-}
+// export const deleteVacation = async (req, res) => {
+//   try {
+//     const user = await users.findOne({ account: req.user.account })
+//     const vacation = users.vacation._id(req.params._id)
+//     vacation.remove()
+//     await user.save()
+//     res.status(200).json({ success: true, message: 'Vacation deleted successfully' })
+//   } catch (error) {
+//     res.status(500).json({ success: false, message: 'Unable to delete vacation' })
+//   }
+// }
 
 // export const checkVacation = async (req, res) => {
 //   try {

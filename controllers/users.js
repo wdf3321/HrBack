@@ -1,5 +1,5 @@
 import users from '../models/users.js'
-import vacations from '../models/vacations.js'
+import vacations from '../models/userPunchrecords.js'
 import jwt from 'jsonwebtoken'
 
 export const register = async (req, res) => {
@@ -104,7 +104,6 @@ export const editUser = async (req, res) => {
 export const editUserAdmin = async (req, res) => {
   try {
     const data = {
-      // account: req.body.account,
       phone: req.body.phone,
       name: req.body.name,
       id: req.body.id,
@@ -200,7 +199,7 @@ export const deleteUser = async (req, res) => {
 
 export const findUserVacation = async (req, res) => {
   try {
-    const result = await vacations.find({ name: req.params.name })
+    const result = await vacations.find({ number: req.params.number })
     res.status(200).json({ success: true, message: result })
   } catch (error) {
     res.status(500).json({ success: false, message: error.message })

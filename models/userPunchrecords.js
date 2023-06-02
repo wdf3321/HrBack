@@ -6,6 +6,10 @@ const schema = new Schema(
       type: String,
       required: [true, '請輸入姓名']
     },
+    number: {
+      type: String,
+      required: [true, '請輸入員工編號']
+    },
     date: {
       type: String,
       required: [true, '請輸入日期']
@@ -21,6 +25,13 @@ const schema = new Schema(
     hours: {
       type: Number,
       default: 0
+    },
+    state: {
+      type: String,
+      default: '審核中',
+      enum: {
+        values: ['審核中', '已審核', '已退回']
+      }
     }
   },
   { versionKey: false }
