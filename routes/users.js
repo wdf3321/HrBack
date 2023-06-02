@@ -10,12 +10,12 @@ import {
   getUser,
   editUser,
   findAllUserVacation,
-  findVacationsByDate,
   getAllUser,
   deleteUser,
   editUserAdmin,
   findUserVacation
 } from '../controllers/users.js'
+// --------------------------------------------
 import { createVacation, findVacation, checkVacation, offVacation } from '../controllers/vacation.js'
 
 const router = Router()
@@ -44,13 +44,13 @@ router.post('/vacation/on', auth.jwt, createVacation)// 上班
 router.patch('/vacation/off', auth.jwt, offVacation)// 下班
 // 查自己打卡紀錄
 router.get('/:number', auth.jwt, findVacation)
-// 更改打卡單已審核未審核
+// 更改打卡已審核未審核
 router.patch('/vacation/check', auth.jwt, checkVacation)
 // 編輯使用者
 router.patch('/:id', content('application/json'), auth.jwt, editUser)
 router.patch('/admin/:id', content('application/json'), auth.jwt, admin, editUserAdmin)
-// 指定日期打卡紀錄
-router.post('/vacation/find', auth.jwt, findVacationsByDate)
+// -------------------------------------------
+// router.post('/vacation/find', auth.jwt, findVacationsByDate)
 // router.delete('/vacation/delete/:id', auth.jwt, deleteVacation)
 
 export default router
