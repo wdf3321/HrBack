@@ -35,8 +35,6 @@ app.use((_, req, res, next) => {
 })
 
 app.use('/users', userRoute)
-// app.use('/bulletin', bulletinRoute)
-// app.use('./vacation', vacationRoute)
 
 app.all('*', (req, res) => {
   res.status(404).json({ success: false, message: '找不到' })

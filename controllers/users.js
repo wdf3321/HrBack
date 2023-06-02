@@ -168,15 +168,15 @@ export const findAllUserVacation = async (req, res) => {
 //   }
 // }
 
-export const findVacationsByDate = async (req, res) => {
-  try {
-    const date = req.body.date
-    const vacationss = await users.find({ startDate: { $lte: date }, endDate: { $gte: date } })
-    res.status(200).json({ success: true, message: vacationss })
-  } catch (error) {
-    res.status(500).json({ success: false, message: error.message })
-  }
-}
+// export const findVacationsByDate = async (req, res) => {
+//   try {
+//     const date = req.body.date
+//     const vacationss = await vacations.find({ date: { $lte: date }, endDate: { $gte: date } })
+//     res.status(200).json({ success: true, message: vacationss })
+//   } catch (error) {
+//     res.status(500).json({ success: false, message: error.message })
+//   }
+// }
 
 export const getAllUser = async (req, res) => {
   try {
