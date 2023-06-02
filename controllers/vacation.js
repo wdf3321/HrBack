@@ -52,9 +52,19 @@ export const findVacation = async (req, res) => {
 // }
 export const checkVacation = async (req, res) => {
   try {
-    const result = await vacations.findByIdAndUpdate(req.body.id, { state: req.body.state }, { new: true })
+    const documentIds = req.body.id
+    const results = []
 
-    res.status(200).json({ success: true, message: result })
+    for (const documentId of documentIds) {
+      const result = await vacations.findByIdAndUpdate(
+        documentId,
+        { state: req.body.state },
+        { new: true }
+      )
+      results.push(result)
+    }
+
+    res.status(200).json({ success: true, message: results })
   } catch (error) {
     res.status(500).json({ success: false, message: error.message })
   }
