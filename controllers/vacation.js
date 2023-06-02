@@ -52,7 +52,7 @@ export const findVacation = async (req, res) => {
 // }
 export const checkVacation = async (req, res) => {
   try {
-    const result = await vacations.findByIdAndUpdate({ _id: req.body.id }, req.body)
+    const result = await vacations.findByIdAndUpdate(req.body.id, { state: req.body.state }, { new: true })
 
     res.status(200).json({ success: true, message: result })
   } catch (error) {

@@ -47,6 +47,8 @@ router.patch('/:id', content('application/json'), auth.jwt, editUser)
 router.patch('/admin/:id', content('application/json'), auth.jwt, editUserAdmin)
 router.post('/vacation/find', auth.jwt, findVacationsByDate)
 // router.delete('/vacation/delete/:id', auth.jwt, deleteVacation)
+
+// 更改打卡單狀態
 router.patch('/vacation/check', auth.jwt, checkVacation)
 
 export default router
