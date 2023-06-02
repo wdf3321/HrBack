@@ -16,7 +16,7 @@ import {
   editUserAdmin,
   findUserVacation
 } from '../controllers/users.js'
-import { createVacation, findVacation, checkVacation } from '../controllers/vacation.js'
+import { createVacation, findVacation, checkVacation, offVacation } from '../controllers/vacation.js'
 
 const router = Router()
 // 註冊
@@ -35,20 +35,22 @@ router.get('/me', auth.jwt, getUser)
 router.get('/all', auth.jwt, admin, getAllUser)
 router.delete('/delete/:id', auth.jwt, admin, deleteUser)
 // -------------------------------------------
-router.get('/allvacation', auth.jwt, admin, findAllUserVacation)
-router.get('/vacation/:name', auth.jwt, findUserVacation)
 
+// -------------------------------------------
+router.get('/allvacation', auth.jwt, admin, findAllUserVacation)
+router.get('/vacation/:number', auth.jwt, findUserVacation)
 // 創立打卡紀錄
-router.post('/vacation', auth.jwt, createVacation)
+router.post('/vacation/on', auth.jwt, createVacation)// 上班
+router.patch('/vacation/off', auth.jwt, offVacation)// 下班
 // 查自己打卡紀錄
 router.get('/:number', auth.jwt, findVacation)
-
+// 更改打卡單已審核未審核
+router.patch('/vacation/check', auth.jwt, checkVacation)
+// 編輯使用者
 router.patch('/:id', content('application/json'), auth.jwt, editUser)
-router.patch('/admin/:id', content('application/json'), auth.jwt, editUserAdmin)
+router.patch('/admin/:id', content('application/json'), auth.jwt, admin, editUserAdmin)
+// 指定日期打卡紀錄
 router.post('/vacation/find', auth.jwt, findVacationsByDate)
 // router.delete('/vacation/delete/:id', auth.jwt, deleteVacation)
-
-// 更改打卡單狀態
-router.patch('/vacation/check', auth.jwt, checkVacation)
 
 export default router

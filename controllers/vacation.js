@@ -21,6 +21,14 @@ export const createVacation = async (req, res) => {
     }
   }
 }
+export const offVacation = async (req, res) => {
+  try {
+    const result = await vacations.findOneAndUpdate({ date: req.body.date, number: req.user.number }, { onClockOut: req.body.onClockOut }, { new: true })
+    res.status(200).json({ success: true, message: result })
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message })
+  }
+}
 
 export const findVacation = async (req, res) => {
   const result = await vacations.find({ number: req.user.number })

@@ -83,12 +83,13 @@ export const getUser = (req, res) => {
 export const editUser = async (req, res) => {
   try {
     const data = {
-      number: req.user.number,
+      number: req.body.number,
       name: req.body.name,
       password: req.body.password
     }
     const id = req.user._id
     console.log(req.body)
+    console.log(req.user)
     const result = await users.findByIdAndUpdate(id, data, { new: true })
     res.status(200).send({ success: true, message: result })
   } catch (error) {
@@ -104,10 +105,8 @@ export const editUser = async (req, res) => {
 export const editUserAdmin = async (req, res) => {
   try {
     const data = {
-      phone: req.body.phone,
+      number: req.body.number,
       name: req.body.name,
-      id: req.body.id,
-      role: req.body.role,
       password: req.body.password
     }
     const result = await users.findByIdAndUpdate({ _id: req.body.id }, data, { new: true })
