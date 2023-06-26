@@ -16,7 +16,6 @@ import {
   findUserVacation
 } from '../controllers/users.js'
 // --------------------------------------------
-import { createVacation, findVacation, checkVacation, offVacation } from '../controllers/vacation.js'
 
 const router = Router()
 // 註冊
@@ -39,13 +38,7 @@ router.delete('/delete/:id', auth.jwt, admin, deleteUser)
 // -------------------------------------------
 router.get('/allvacation', auth.jwt, admin, findAllUserVacation)
 router.get('/vacation/:number', auth.jwt, findUserVacation)
-// 創立打卡紀錄
-router.post('/vacation/on', auth.jwt, createVacation)// 上班
-router.patch('/vacation/off', auth.jwt, offVacation)// 下班
-// 查自己,某人打卡紀錄
-router.get('/:number', auth.jwt, findVacation)
-// 更改打卡已審核未審核
-router.patch('/vacation/check', auth.jwt, checkVacation)
+
 // 編輯使用者
 router.patch('/:id', content('application/json'), auth.jwt, editUser)
 router.patch('/admin/:id', content('application/json'), auth.jwt, admin, editUserAdmin)

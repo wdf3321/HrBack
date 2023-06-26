@@ -11,11 +11,11 @@ const schema = new Schema(
     // 工號
     number: {
       type: String,
-      reqired: [true, '缺少帳號'],
-      minlength: [4, '最請設定 4 個字元以上的帳號'],
-      maxlength: [20, '最請設定 20 個字元以下的帳號'],
+      reqired: [true, '缺少功號'],
+      minlength: [4, '4 個字元以上'],
+      maxlength: [20, '20 個字元以下'],
       unique: true,
-      match: [/^[A-Za-z0-9]+$/, '帳號格式錯誤']
+      match: [/^[A-Za-z0-9]+$/, '格式錯誤']
     },
     password: {
       type: String,
@@ -30,6 +30,10 @@ const schema = new Schema(
       // 0 = 使用者
       // 1 = 管理員
       default: 0
+    },
+    image: {
+      type: String,
+      default: undefined
     }
   },
   { versionKey: false }
