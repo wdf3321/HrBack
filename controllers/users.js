@@ -88,8 +88,6 @@ export const editUser = async (req, res) => {
       password: req.body.password
     }
     const id = req.user._id
-    console.log(req.body)
-    console.log(req.user)
     const result = await users.findByIdAndUpdate(id, data, { new: true })
     res.status(200).send({ success: true, message: result })
   } catch (error) {
