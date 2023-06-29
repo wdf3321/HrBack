@@ -17,6 +17,9 @@ app.use(
   })
 )
 
+app.get('/', (req, res) => {
+  res.status(200).send('OK')
+})
 // 處理跨域錯誤
 app.use((_, req, res, next) => {
   res.status(403).json({ success: false, message: '請求被拒' })
@@ -35,5 +38,5 @@ app.all('*', (req, res) => {
 })
 
 app.listen(process.env.PORT || 4000, () => {
-  console.log('Server is running on port 4000')
+  console.log(`Server is running on port ${process.env.PORT || 4000}`)
 })

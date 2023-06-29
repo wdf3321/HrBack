@@ -1,5 +1,5 @@
 import passport from 'passport'
-import bcrypt from 'bcrypt'
+import bcrypt from 'bcryptjs'
 import passportLocal from 'passport-local'
 import passportJWT from 'passport-jwt'
 import users from '../models/users.js'
