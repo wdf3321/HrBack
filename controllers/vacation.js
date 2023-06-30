@@ -88,6 +88,13 @@ export const findVacation = async (req, res) => {
   res.status(200).json({ success: true, message: '', result })
 }
 
+export const findAllVacation = async (req, res) => {
+  console.log('aaa')
+  const result = await userPunchrecords.find({})
+
+  res.status(200).json({ success: true, message: 'aaaS', result })
+}
+
 export const checkVacation = async (req, res) => {
   try {
     const documentIds = req.body.id
