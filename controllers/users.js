@@ -45,7 +45,9 @@ export const login = async (req, res) => {
 
 export const logout = async (req, res) => {
   try {
-    req.user.tokens = req.user.tokens.filter(token => token !== req.token)
+    console.log(req.user.tokens)
+    req.user.tokens = []
+
     await req.user.save()
     res.status(200).json({ success: true, message: '' })
   } catch (error) {
@@ -105,9 +107,13 @@ export const editUserAdmin = async (req, res) => {
     const data = {
       number: req.body.number,
       name: req.body.name,
-      password: req.body.password
+      role: req.body.role
     }
-    const result = await users.findByIdAndUpdate({ _id: req.body.id }, data, { new: true })
+    // 如果 req.body.password 不為空，则添加到 data
+    if (req.body.password) {
+      data.password = req.body.password
+    }
+    const result = await users.findByIdAndUpdate({ _id: req.body._id }, data, { new: true })
     res.status(200).send({ success: true, message: result })
   } catch (error) {
     if (error.name === 'ValidationError') {

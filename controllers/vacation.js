@@ -3,42 +3,74 @@ import userPunchrecords from '../models/userPunchrecords.js'
 import { DateTime, Duration } from 'luxon'
 
 export const createVacation = async (req, res) => {
-  try {
-    const result = userPunchrecords.create({
-      name: req.user.name,
-      number: req.user.number,
-      onClockIn: req.body.onClockIn,
-      onClockOut: req.body.onClockOut,
-      year: req.body.year,
-      month: req.body.month,
-      day: req.body.day,
-      state: req.body.state,
-      hours: req.body.hours
-    })
-    res.status(200).json({ success: true, message: result })
-  } catch (error) {
-    if (error.name === 'ValidationError') {
-      res.status(400).json({ success: false, message: error.errors[Object.keys(error.errors)[0]].message })
-    } else {
-      res.status(500).json({ success: false, message: error.message })
+  const find = await userPunchrecords.findOne({ day: req.body.day, month: req.body.month, number: req.user.number })
+  if (find) {
+    res.status(500).json({ success: false, message: '你今天已打過卡' })
+  } else {
+    try {
+      const result = userPunchrecords.create({
+        name: req.user.name,
+        number: req.user.number,
+        onClockIn: req.body.onClockIn,
+        onClockOut: req.body.onClockOut,
+        year: req.body.year,
+        month: req.body.month,
+        day: req.body.day,
+        state: req.body.state,
+        hours: req.body.hours
+      })
+      res.status(200).json({ success: true, data: result })
+    } catch (error) {
+      if (error.name === 'ValidationError') {
+        res.status(400).json({ success: false, message: error.errors[Object.keys(error.errors)[0]].message })
+      } else {
+        res.status(500).json({ success: false, message: error.message })
+      }
     }
   }
 }
+
 export const offVacation = async (req, res) => {
   try {
     const find = await userPunchrecords.findOne({ day: req.body.day, month: req.body.month, number: req.user.number })
+    const day = parseInt(req.body.day)
+    const month = parseInt(req.body.month)
+    const year = new Date().getFullYear() // 使用當前年份
     const startTimeString = await find.onClockIn
     const endTimeString = await req.body.onClockOut
-    const formatString = await 'HH:mm'
-    const startTime = await DateTime.fromFormat(startTimeString, formatString)
+    // const formatString = 'HH:mm'
 
-    const endTime = await DateTime.fromFormat(endTimeString, formatString)
-    // 計算小時和分鐘
-    const diffInMillis = await endTime.valueOf() - startTime.valueOf()
-    const diffInMinutes = await diffInMillis / (1000 * 60) // 轉換為分鐘
-    const hours = await Math.floor(diffInMinutes / 60) // 取小時
-    const minutes = await diffInMinutes % 60 // 取餘得分鐘
-    const HourSent = await hours + ':' + minutes
+    const startTime = DateTime.fromObject({ year, month, day, hour: parseInt(startTimeString.split(':')[0]), minute: parseInt(startTimeString.split(':')[1]) })
+    const endTime = DateTime.fromObject({ year, month, day, hour: parseInt(endTimeString.split(':')[0]), minute: parseInt(endTimeString.split(':')[1]) })
+
+    let hours = 0
+    let minutes = 0
+
+    if (endTime < startTime) {
+      // 跨天情況
+      const midnight = DateTime.fromISO('00:00', { zone: 'utc' }).setZone('Asia/Taipei')
+      const diffUntilMidnight = midnight.diff(startTime).as('minutes')
+      const diffAfterMidnight = endTime.plus({ days: 1 }).diff(midnight).as('minutes')
+
+      hours = Math.floor((diffUntilMidnight + diffAfterMidnight) / 60)
+      minutes = (diffUntilMidnight + diffAfterMidnight) % 60
+    } else {
+      const diffInMillis = endTime.diff(startTime).as('milliseconds')
+      const diffInMinutes = diffInMillis / (1000 * 60) // 轉換為分鐘
+      hours = Math.floor(diffInMinutes / 60) // 取小時
+      minutes = diffInMinutes % 60 // 取餘得分鐘
+    }
+
+    // 補零處理
+    const formattedHours = Math.abs(hours).toString().padStart(2, '0')
+    const formattedMinutes = Math.abs(minutes).toString().padStart(2, '0')
+
+    const sign = (hours < 0 || minutes < 0) ? '-' : '' // 判斷是否為負數
+
+    const HourSent = `${sign}${formattedHours}:${formattedMinutes}`
+
+    console.log(HourSent)
+
     // ------------------------------------------------
     const result = await userPunchrecords.findOneAndUpdate(
       { day: req.body.day, month: req.body.month, number: req.user.number },
@@ -74,7 +106,7 @@ export const checkVacation = async (req, res) => {
 
 export const UserTotalWorkTime = async (req, res) => {
   try {
-    const userPunchRecords = await userPunchrecords.find({ number: req.user.number })
+    const userPunchRecords = await userPunchrecords.find({ number: req.user.number, month: DateTime.now().month })
     let totalDuration = await Duration.fromObject({ hours: 0, minutes: 0 })
     await userPunchRecords.forEach(record => {
       const [hours, minutes] = record.hours.split(':').map(Number)
@@ -83,7 +115,7 @@ export const UserTotalWorkTime = async (req, res) => {
     })
     const totalHours = await Math.floor(totalDuration.as('hours'))
     const totalMinutes = await Math.floor(totalDuration.as('minutes')) % 60
-    const result = await `${totalHours}: ${totalMinutes.toString().padStart(2, '0')}`
+    const result = await `${totalHours}:${totalMinutes.toString().padStart(2, '0')}`
     res.status(200).json({ success: true, message: result })
   } catch (error) {
     console.error(error)

@@ -12,7 +12,7 @@ router.patch('/off', auth.jwt, offVacation)// 下班
 router.get('/:number', auth.jwt, findVacation)
 // 更改打卡已審核未審核
 router.patch('/check', admin, auth.jwt, checkVacation)
-// 總時長
+// 當月總時長
 router.get('/time/:number', auth.jwt, UserTotalWorkTime)
 
 export default router
