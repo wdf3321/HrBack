@@ -84,17 +84,30 @@ export const offVacation = async (req, res) => {
 }
 
 export const findVacation = async (req, res) => {
-  const result = await userPunchrecords.find({ number: req.params.number })
+  const result = await userPunchrecords.find({ number: req.params.number, month: DateTime.now().month, year: DateTime.now().year })
   res.status(200).json({ success: true, message: '', result })
 }
-
-export const findAllVacation = async (req, res) => {
-  console.log('aaa')
-  const result = await userPunchrecords.find({})
-
-  res.status(200).json({ success: true, message: 'aaaS', result })
+export const findVacationByMonth = async (req, res) => {
+  const result = await userPunchrecords.find({ month: req.body.month, year: DateTime.now().year, number: req.params.number })
+  res.status(200).json({ success: true, message: result })
 }
-
+export const findVacationByYear = async (req, res) => {
+  const result = await userPunchrecords.find({ year: req.body.year, number: req.params.number })
+  res.status(200).json({ success: true, message: result })
+}
+export const findAllVacation = async (req, res) => {
+  const result = await userPunchrecords.find({})
+  res.status(200).json({ success: true, message: result })
+}
+export const findAllVacationByMonth = async (req, res) => {
+  const result = await userPunchrecords.find({ month: req.params.month, year: DateTime.now().year })
+  res.status(200).json({ success: true, message: result })
+}
+export const findAllVacationByYear = async (req, res) => {
+  const result = await userPunchrecords.find({ year: req.params.year })
+  res.status(200).json({ success: true, message: result })
+}
+// ------------------------------------------------
 export const checkVacation = async (req, res) => {
   try {
     const documentIds = req.body.id
@@ -114,6 +127,24 @@ export const checkVacation = async (req, res) => {
 export const UserTotalWorkTime = async (req, res) => {
   try {
     const userPunchRecords = await userPunchrecords.find({ number: req.user.number, month: DateTime.now().month })
+    let totalDuration = await Duration.fromObject({ hours: 0, minutes: 0 })
+    await userPunchRecords.forEach(record => {
+      const [hours, minutes] = record.hours.split(':').map(Number)
+      const duration = Duration.fromObject({ hours, minutes })
+      totalDuration = totalDuration.plus(duration)
+    })
+    const totalHours = await Math.floor(totalDuration.as('hours'))
+    const totalMinutes = await Math.floor(totalDuration.as('minutes')) % 60
+    const result = await `${totalHours}:${totalMinutes.toString().padStart(2, '0')}`
+    res.status(200).json({ success: true, message: result })
+  } catch (error) {
+    console.error(error)
+  }
+}
+
+export const UserTotalWorkTimeByMonth = async (req, res) => {
+  try {
+    const userPunchRecords = await userPunchrecords.find({ number: req.params.number, month: req.params.month })
     let totalDuration = await Duration.fromObject({ hours: 0, minutes: 0 })
     await userPunchRecords.forEach(record => {
       const [hours, minutes] = record.hours.split(':').map(Number)
