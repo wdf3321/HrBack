@@ -33,6 +33,7 @@ export const createVacation = async (req, res) => {
 export const offVacation = async (req, res) => {
   try {
     const find = await userPunchrecords.findOne({ day: req.body.day, month: req.body.month, number: req.user.number })
+    console.log(req.body)
     const day = parseInt(req.body.day)
     const month = parseInt(req.body.month)
     const year = new Date().getFullYear() // 使用當前年份
@@ -183,5 +184,3 @@ export const UserTotalWorkTimeByMonth = async (req, res) => {
 //     res.status(500).json({ success: false, message: error.message })
 //   }
 // }
-
-// 保存所有记录的数组
