@@ -1,7 +1,8 @@
 // import users from '../models/users.js'
 import userPunchrecords from '../models/userPunchrecords.js'
 import { DateTime, Duration } from 'luxon'
-
+// import CircularJSON from 'circular-json'
+// ----------------------------------------------
 export const createVacation = async (req, res) => {
   const find = await userPunchrecords.findOne({ day: req.body.day, month: req.body.month, number: req.user.number })
   if (find) {
@@ -13,11 +14,14 @@ export const createVacation = async (req, res) => {
         number: req.user.number,
         onClockIn: req.body.onClockIn,
         onClockOut: req.body.onClockOut,
+        editClockIn: req.body.onClockIn,
+        editClockOut: req.body.onClockIn,
         year: req.body.year,
         month: req.body.month,
         day: req.body.day,
         state: req.body.state,
-        hours: req.body.hours
+        hours: req.body.hours,
+        team: req.user.team
       })
       res.status(200).json({ success: true, data: result })
     } catch (error) {
@@ -32,8 +36,7 @@ export const createVacation = async (req, res) => {
 
 export const offVacation = async (req, res) => {
   try {
-    const find = await userPunchrecords.findOne({ day: req.body.day, month: req.body.month, number: req.user.number })
-    console.log(req.body)
+    const find = await userPunchrecords.findOne({ day: req.body.day, month: req.body.month, number: req.user.number, year: DateTime.now().year })
     const day = parseInt(req.body.day)
     const month = parseInt(req.body.month)
     const year = new Date().getFullYear() // 使用當前年份
@@ -111,11 +114,11 @@ export const findAllVacationByYear = async (req, res) => {
 // ------------------------------------------------
 export const checkVacation = async (req, res) => {
   try {
-    const documentIds = req.body.id
+    const documentIds = req.body._id
     const results = []
 
     for (const documentId of documentIds) {
-      const result = await userPunchrecords.findByIdAndUpdate(documentId, { state: req.body.state }, { new: true })
+      const result = await userPunchrecords.findByIdAndUpdate(documentId, { state: req.body.state, onClockOut: req.body.onClockOut }, { new: true })
       results.push(result)
     }
 
@@ -161,6 +164,56 @@ export const UserTotalWorkTimeByMonth = async (req, res) => {
   }
 }
 
+export const editVacation = async (req, res) => {
+  try {
+    const result = await userPunchrecords.findByIdAndUpdate(req.body._id, { editClockIn: req.body.editClockIn, editClockOut: req.body.editClockOut }, { new: true })
+    const find = await userPunchrecords.findOne({ _id: req.body._id })
+    const day = parseInt(find.day)
+    const month = parseInt(find.month)
+    const year = new Date().getFullYear() // 使用當前年份
+    const startTimeString = await find.editClockIn
+    const endTimeString = await find.editClockOut
+    const startTime = DateTime.fromObject({ year, month, day, hour: parseInt(startTimeString.split(':')[0]), minute: parseInt(startTimeString.split(':')[1]) })
+    const endTime = DateTime.fromObject({ year, month, day, hour: parseInt(endTimeString.split(':')[0]), minute: parseInt(endTimeString.split(':')[1]) })
+    let hours = 0
+    let minutes = 0
+
+    if (endTime < startTime) {
+      // 跨天情況
+      const midnight = DateTime.fromISO('00:00', { zone: 'utc' }).setZone('Asia/Taipei')
+      const diffUntilMidnight = midnight.diff(startTime).as('minutes')
+      const diffAfterMidnight = endTime.plus({ days: 1 }).diff(midnight).as('minutes')
+
+      hours = Math.floor((diffUntilMidnight + diffAfterMidnight) / 60)
+      minutes = (diffUntilMidnight + diffAfterMidnight) % 60
+    } else {
+      const diffInMillis = endTime.diff(startTime).as('milliseconds')
+      const diffInMinutes = diffInMillis / (1000 * 60) // 轉換為分鐘
+      hours = Math.floor(diffInMinutes / 60) // 取小時
+      minutes = diffInMinutes % 60 // 取餘得分鐘
+    }
+
+    // 補零處理
+    const formattedHours = Math.abs(hours).toString().padStart(2, '0')
+    const formattedMinutes = Math.abs(minutes).toString().padStart(2, '0')
+
+    const sign = (hours < 0 || minutes < 0) ? '-' : '' // 判斷是否為負數
+
+    const HourSent = `${sign}${formattedHours}:${formattedMinutes}`
+
+    console.log(HourSent)
+
+    // ------------------------------------------------
+    const results = await userPunchrecords.findOneAndUpdate(
+      { _id: req.body._id },
+      { hours: HourSent },
+      { new: true }
+    )
+    res.status(200).json({ success: true, message: result, results })
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message })
+  }
+}
 // export const deleteVacation = async (req, res) => {
 //   try {
 //     const user = await users.findOne({ account: req.user.account })

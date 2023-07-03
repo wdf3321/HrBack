@@ -35,9 +35,21 @@ const schema = new Schema(
       type: String,
       default: ''
     },
+    editClockIn: {
+      type: String,
+      default: ''
+    },
+    editClockOut: {
+      type: String,
+      default: ''
+    },
     hours: {
       type: String,
       default: 0
+    },
+    overtimehours: {
+      type: String,
+      default: ''
     },
     state: {
       type: String,
@@ -45,6 +57,13 @@ const schema = new Schema(
       required: false,
       enum: {
         values: ['審核中', '已審核', '已退回']
+      }
+    },
+    team: {
+      type: String,
+      default: '早班',
+      enum: {
+        values: ['資訊', '早班', '晚班']
       }
     }
   },

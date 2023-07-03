@@ -34,6 +34,13 @@ const schema = new Schema(
     image: {
       type: String,
       default: undefined
+    },
+    team: {
+      type: String,
+      default: '早班',
+      enum: {
+        values: ['資訊', '早班', '晚班']
+      }
     }
   },
   { versionKey: false }

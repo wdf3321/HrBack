@@ -8,7 +8,9 @@ export const register = async (req, res) => {
       name: req.body.name,
       number: req.body.number,
       password: req.body.password,
-      image: req.body?.image || ''
+      image: req.body?.image || '',
+      team: req.body.team,
+      role: req.body?.role || 0
     })
     res.status(200).json({ success: true, message: '' })
   } catch (error) {
@@ -35,7 +37,8 @@ export const login = async (req, res) => {
         token,
         name: req.user.name,
         number: req.user.number,
-        role: req.user.role
+        role: req.user.role,
+        team: req.user.team
       }
     })
   } catch (error) {
@@ -76,7 +79,8 @@ export const getUser = (req, res) => {
       result: {
         name: req.user.name,
         number: req.user.number,
-        role: req.user.role
+        role: req.user.role,
+        team: req.user.team
       }
     })
   } catch (error) {
@@ -88,7 +92,10 @@ export const editUser = async (req, res) => {
     const data = {
       number: req.body.number,
       name: req.body.name,
-      password: req.body.password
+      team: req.body.team
+    }
+    if (req.body.password) {
+      data.password = req.body.password
     }
     const id = req.user._id
     const result = await users.findByIdAndUpdate(id, data, { new: true })
@@ -108,7 +115,8 @@ export const editUserAdmin = async (req, res) => {
     const data = {
       number: req.body.number,
       name: req.body.name,
-      role: req.body.role
+      role: req.body.role,
+      team: req.body.team
     }
     // 如果 req.body.password 不為空，则添加到 data
     if (req.body.password) {
