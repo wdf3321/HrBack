@@ -7,7 +7,8 @@ export const register = async (req, res) => {
     await users.create({
       name: req.body.name,
       number: req.body.number,
-      password: req.body.password
+      password: req.body.password,
+      image: req.body?.image || ''
     })
     res.status(200).json({ success: true, message: '' })
   } catch (error) {
