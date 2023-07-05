@@ -10,6 +10,10 @@ const schema = new Schema(
       type: String,
       required: [true, '請輸入員工編號']
     },
+    place: {
+      type: String,
+      default: '總部'
+    },
     year: {
       type: String
     },
@@ -27,7 +31,7 @@ const schema = new Schema(
       type: String,
       default: ''
     },
-    overtimehours: {
+    hours: {
       type: String,
       default: ''
     },
@@ -42,4 +46,4 @@ const schema = new Schema(
   { versionKey: false }
 )
 
-export default model('workSchedule', schema)
+export default model('workSchedules', schema)

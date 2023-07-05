@@ -95,6 +95,10 @@ export const findVacationByMonth = async (req, res) => {
   const result = await userPunchrecords.find({ month: req.body.month, year: req.body.year, number: req.params.number })
   res.status(200).json({ success: true, message: result })
 }
+export const findVacationByMonthLength = async (req, res) => {
+  const result = await userPunchrecords.find({ month: req.body.month, year: req.body.year, number: req.params.number })
+  res.status(200).json({ success: true, message: result.length })
+}
 export const findVacationByYear = async (req, res) => {
   const result = await userPunchrecords.find({ year: req.body.year, number: req.params.number })
   res.status(200).json({ success: true, message: result })

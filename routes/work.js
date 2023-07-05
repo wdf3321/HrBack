@@ -2,7 +2,7 @@ import { Router } from 'express'
 import admin from '../middleware/admin.js'
 // import content from '../middleware/content.js'
 import * as auth from '../middleware/auth.js'
-import { createVacation, findVacation, findVacationByMonth, findVacationByYear, findAllVacation, findAllVacationByMonth, findAllVacationByYear, checkVacation, offVacation, UserTotalWorkTime, UserTotalWorkTimeByMonth, editVacation } from '../controllers/vacation.js'
+import { createVacation, findVacation, findVacationByMonth, findVacationByYear, findAllVacation, findAllVacationByMonth, findAllVacationByYear, checkVacation, offVacation, UserTotalWorkTime, UserTotalWorkTimeByMonth, editVacation, findVacationByMonthLength } from '../controllers/vacation.js'
 
 const router = Router()
 // 創立打卡紀錄
@@ -14,6 +14,7 @@ router.get('/month/:month', auth.jwt, findAllVacationByMonth)
 router.get('/year/:year', auth.jwt, findAllVacationByYear)
 router.get('/:number', auth.jwt, findVacation)
 router.post('/month/:number', auth.jwt, findVacationByMonth)
+router.post('/monthlength/:number', auth.jwt, findVacationByMonthLength)
 router.post('/year/:number', auth.jwt, findVacationByYear)
 // 更改打卡已審核未審核
 router.patch('/check', auth.jwt, checkVacation)
