@@ -174,16 +174,22 @@ export const editVacation = async (req, res) => {
     const find = await userPunchrecords.findOne({ _id: req.body._id })
     const day = parseInt(find.day)
     const month = parseInt(find.month)
-    const year = new Date().getFullYear() // 使用當前年份
-    const startTimeString = await find.editClockIn
-    const endTimeString = await find.editClockOut
-    const startTime = DateTime.fromObject({ year, month, day, hour: parseInt(startTimeString.split(':')[0]), minute: parseInt(startTimeString.split(':')[1]) })
-    const endTime = DateTime.fromObject({ year, month, day, hour: parseInt(endTimeString.split(':')[0]), minute: parseInt(endTimeString.split(':')[1]) })
+    const year = new Date().getFullYear() // 使用当前年份
+    const startTimeString = find.editClockIn
+    const endTimeString = find.editClockOut
+
+    let startTime = DateTime.fromObject({ year, month, day, hour: parseInt(startTimeString.split(':')[0]), minute: parseInt(startTimeString.split(':')[1]) })//eslint-disable-line
+    let endTime = DateTime.fromObject({ year, month, day, hour: parseInt(endTimeString.split(':')[0]), minute: parseInt(endTimeString.split(':')[1]) })
+
+    if (req.body.breaktime === true) {
+      endTime = endTime.minus({ hours: 1 })
+    }
+
     let hours = 0
     let minutes = 0
 
     if (endTime < startTime) {
-      // 跨天情況
+      // 跨天情况
       const midnight = DateTime.fromISO('00:00', { zone: 'utc' }).setZone('Asia/Taipei')
       const diffUntilMidnight = midnight.diff(startTime).as('minutes')
       const diffAfterMidnight = endTime.plus({ days: 1 }).diff(midnight).as('minutes')
@@ -192,16 +198,16 @@ export const editVacation = async (req, res) => {
       minutes = (diffUntilMidnight + diffAfterMidnight) % 60
     } else {
       const diffInMillis = endTime.diff(startTime).as('milliseconds')
-      const diffInMinutes = diffInMillis / (1000 * 60) // 轉換為分鐘
-      hours = Math.floor(diffInMinutes / 60) // 取小時
-      minutes = diffInMinutes % 60 // 取餘得分鐘
+      const diffInMinutes = diffInMillis / (1000 * 60) // 转换为分钟
+      hours = Math.floor(diffInMinutes / 60) // 取小时
+      minutes = diffInMinutes % 60 // 取余得分钟
     }
 
-    // 補零處理
+    // 补零处理
     const formattedHours = Math.abs(hours).toString().padStart(2, '0')
     const formattedMinutes = Math.abs(minutes).toString().padStart(2, '0')
 
-    const sign = (hours < 0 || minutes < 0) ? '-' : '' // 判斷是否為負數
+    const sign = (hours < 0 || minutes < 0) ? '-' : '' // 判断是否为负数
 
     const HourSent = `${sign}${formattedHours}:${formattedMinutes}`
 
@@ -213,11 +219,13 @@ export const editVacation = async (req, res) => {
       { hours: HourSent },
       { new: true }
     )
+
     res.status(200).json({ success: true, message: result, results })
   } catch (error) {
     res.status(500).json({ success: false, message: error.message })
   }
 }
+
 // export const deleteVacation = async (req, res) => {
 //   try {
 //     const user = await users.findOne({ account: req.user.account })

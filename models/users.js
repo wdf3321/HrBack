@@ -39,8 +39,26 @@ const schema = new Schema(
       type: String,
       default: '早班',
       enum: {
-        values: ['資訊', '早班', '晚班']
+        values: ['資訊', '早班', '晚班', '人事']
       }
+    },
+    // 到職年月日
+    year: {
+      type: String
+    },
+    month: {
+      type: String
+    },
+    day: {
+      type: String
+    },
+    timerecord: {
+      type: [
+        {
+          date: { type: String },
+          time: { type: String }
+        }
+      ]
     }
   },
   { versionKey: false }

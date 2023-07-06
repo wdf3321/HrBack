@@ -10,7 +10,10 @@ export const register = async (req, res) => {
       password: req.body.password,
       image: req.body?.image || '',
       team: req.body.team,
-      role: req.body?.role || 0
+      role: req.body?.role || 0,
+      year: req.body.year,
+      month: req.body.month,
+      day: req.body.day
     })
     res.status(200).json({ success: true, message: '' })
   } catch (error) {

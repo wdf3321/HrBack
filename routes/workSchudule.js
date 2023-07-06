@@ -15,6 +15,8 @@ router.get('/year/:year', auth.jwt, findAllSchuduleByYear)
 router.get('/:number', auth.jwt, findSchudule)
 router.post('/month/:number', auth.jwt, findSchuduleByMonth)
 router.post('/year/:number', auth.jwt, findSchuduleByYear)
+// csv導入班表
+router.post('/csvtowork', upload, csvtowork)
 // // 更改打卡已審核未審核
 // router.patch('/check', auth.jwt, checkVacation)
 // // 當月總時長
@@ -24,4 +26,5 @@ router.post('/year/:number', auth.jwt, findSchuduleByYear)
 // router.patch('/approve/edittime', auth.jwt, editVacation)
 
 router.post('/csvtowork', upload, csvtowork)
+
 export default router
