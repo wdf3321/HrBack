@@ -39,7 +39,7 @@ const schema = new Schema(
       type: String,
       default: '早班',
       enum: {
-        values: ['資訊', '早班', '晚班']
+        values: ['資訊', '早班', '晚班', '人事', 'PT']
       }
     }
   },

@@ -6,6 +6,11 @@ import userRoute from './routes/users.js'
 import workRoute from './routes/work.js'
 import workScheduleRoute from './routes/workSchudule.js'
 import './passport/passport.js'
+import { fileURLToPath } from 'url'
+import { dirname, join } from 'path'
+
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = dirname(__filename)
 
 mongoose.connect(process.env.DB_URL)
 mongoose.set('sanitizeFilter', true)
@@ -34,7 +39,14 @@ app.use((_, req, res, next) => {
 app.use('/users', userRoute)
 app.use('/work', workRoute)
 app.use('/workschedule', workScheduleRoute)
-
+app.get('/download/workschedule', (req, res) => {
+  const file = join(__dirname, './workschedule.csv') // 使用path.join來建立路徑
+  res.download(file) // 讓用戶端下載這個檔案
+})
+app.get('/download/work', (req, res) => {
+  const file = join(__dirname, './workinput.csv') // 使用path.join來建立路徑
+  res.download(file) // 讓用戶端下載這個檔案
+})
 app.all('*', (req, res) => {
   res.status(404).json({ success: false, message: '找不到' })
 })

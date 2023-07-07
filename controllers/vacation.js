@@ -2,6 +2,7 @@
 import userPunchrecords from '../models/userPunchrecords.js'
 import { DateTime, Duration } from 'luxon'
 // import CircularJSON from 'circular-json'
+import csvtojson from 'csvtojson'
 // ----------------------------------------------
 export const createVacation = async (req, res) => {
   const find = await userPunchrecords.findOne({ day: req.body.day, month: req.body.month, number: req.user.number })
@@ -224,6 +225,39 @@ export const editVacation = async (req, res) => {
   } catch (error) {
     res.status(500).json({ success: false, message: error.message })
   }
+}
+
+export const csvtowork = async (req, res) => {
+  const csvFilePath = req.file.path
+  const csv = await csvtojson
+  csv()
+    .fromFile(csvFilePath)
+    .then(jsonObj => {
+      for (let i = 0; i < jsonObj.length; i++) {
+        if (jsonObj[i].number === '') {
+          continue
+        } else {
+          userPunchrecords.create({
+            number: jsonObj[i].number,
+            name: jsonObj[i].name,
+            onClockIn: jsonObj[i].onClockIn,
+            onClockOut: jsonObj[i].onClockOut,
+            editClockIn: jsonObj[i].editClockIn,
+            editClockOut: jsonObj[i].editClockOut,
+            year: jsonObj[i].year,
+            month: jsonObj[i].month,
+            day: jsonObj[i].day,
+            hours: jsonObj[i].hours,
+            team: jsonObj[i].team,
+            state: jsonObj[i].state
+          })
+        }
+      }
+    })
+  res.status(200).json({
+    success: true,
+    message: '已收到'
+  })
 }
 
 // export const deleteVacation = async (req, res) => {

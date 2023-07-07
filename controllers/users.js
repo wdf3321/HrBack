@@ -13,7 +13,8 @@ export const register = async (req, res) => {
       role: req.body?.role || 0,
       year: req.body.year,
       month: req.body.month,
-      day: req.body.day
+      day: req.body.day,
+      timerecord: []
     })
     res.status(200).json({ success: true, message: '' })
   } catch (error) {
@@ -41,7 +42,10 @@ export const login = async (req, res) => {
         name: req.user.name,
         number: req.user.number,
         role: req.user.role,
-        team: req.user.team
+        team: req.user.team,
+        year: req.user.year,
+        month: req.user.month,
+        day: req.user.day
       }
     })
   } catch (error) {

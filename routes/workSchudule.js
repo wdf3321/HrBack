@@ -25,6 +25,4 @@ router.post('/csvtowork', upload, csvtowork)
 // // 編輯打卡紀錄
 // router.patch('/approve/edittime', auth.jwt, editVacation)
 
-router.post('/csvtowork', upload, csvtowork)
-
 export default router

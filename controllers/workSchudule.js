@@ -1,4 +1,4 @@
-import workschedule from '../models/workschedule.js'
+import workschedule from '../models/workSchedule.js'
 import { DateTime } from 'luxon'
 import csvtojson from 'csvtojson'
 
