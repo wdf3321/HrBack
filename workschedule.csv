@@ -1,2 +1,2 @@
 ﻿number,name,place,ClockIn,ClockOut,year,month,day,hours,team
-1234,admin(晚,總部,09:00,18:00,2023,7,1,08:00,晚班
+工號,姓名,地點,上班時間,下班時間,年,月,日,時長,組別(早班,pt,晚班)

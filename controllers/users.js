@@ -94,6 +94,12 @@ export const getUser = (req, res) => {
     res.status(500).json({ success: false, message: error.message })
   }
 }
+
+export const getTeam = async (req, res) => {
+  const teamEnumValues = users.schema.path('team').enumValues
+  res.json(teamEnumValues)
+}
+
 export const editUser = async (req, res) => {
   try {
     const data = {

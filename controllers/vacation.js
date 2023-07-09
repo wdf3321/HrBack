@@ -233,7 +233,7 @@ export const csvtowork = async (req, res) => {
   csv()
     .fromFile(csvFilePath)
     .then(jsonObj => {
-      for (let i = 0; i < jsonObj.length; i++) {
+      for (let i = 1; i < jsonObj.length; i++) {
         if (jsonObj[i].number === '') {
           continue
         } else {
