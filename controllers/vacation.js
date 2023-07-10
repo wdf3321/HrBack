@@ -74,8 +74,6 @@ export const offVacation = async (req, res) => {
 
     const HourSent = `${sign}${formattedHours}:${formattedMinutes}`
 
-    console.log(HourSent)
-
     // ------------------------------------------------
     const result = await userPunchrecords.findOneAndUpdate(
       { day: req.body.day, month: req.body.month, number: req.user.number },
@@ -212,8 +210,6 @@ export const editVacation = async (req, res) => {
 
     const HourSent = `${sign}${formattedHours}:${formattedMinutes}`
 
-    console.log(HourSent)
-
     // ------------------------------------------------
     const results = await userPunchrecords.findOneAndUpdate(
       { _id: req.body._id },
@@ -259,27 +255,3 @@ export const csvtowork = async (req, res) => {
     message: '已收到'
   })
 }
-
-// export const deleteVacation = async (req, res) => {
-//   try {
-//     const user = await users.findOne({ account: req.user.account })
-//     const vacation = users.vacation._id(req.params._id)
-//     vacation.remove()
-//     await user.save()
-//     res.status(200).json({ success: true, message: 'Vacation deleted successfully' })
-//   } catch (error) {
-//     res.status(500).json({ success: false, message: 'Unable to delete vacation' })
-//   }
-// }
-
-// export const checkVacation = async (req, res) => {
-//   try {
-//     const userwithVacation = await users.find().populate('vacation')
-//     const userPunchrecords = userwithVacation.flatMap(users => users.vacation)
-//     const result = userwithVacation.findOneAndUpdate({ _id: req.body.id }, req.body)
-//     console.log(result)
-//     res.status(200).json({ success: true, message: userPunchrecords })
-//   } catch (error) {
-//     res.status(500).json({ success: false, message: error.message })
-//   }
-// }

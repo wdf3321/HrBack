@@ -56,7 +56,6 @@ export const login = async (req, res) => {
 
 export const logout = async (req, res) => {
   try {
-    console.log(req.user.tokens)
     req.user.tokens = []
 
     await req.user.save()
