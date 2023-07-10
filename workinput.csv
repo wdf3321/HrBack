@@ -1,2 +1,2 @@
 ﻿number,name,onClockIn,onClockOut,editClockIn,editClockOut,year,month,day,hours,team,state
-工號,姓名,打卡上班,打卡下班,計算上班,計算下班,年,月,日,時長,組別,狀態(審核中,已審核)
+工號,姓名,打卡上班,打卡下班,計算上班,計算下班,年,月,日,時長,組別,"狀態(審核中,已審核)"
