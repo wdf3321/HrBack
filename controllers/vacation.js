@@ -1,8 +1,8 @@
 // import users from '../models/users.js'
 import userPunchrecords from '../models/userPunchrecords.js'
 import { DateTime, Duration } from 'luxon'
-// import CircularJSON from 'circular-json'
 import csvtojson from 'csvtojson'
+import fs from 'fs/promises'
 // ----------------------------------------------
 export const createVacation = async (req, res) => {
   const find = await userPunchrecords.findOne({ day: req.body.day, month: req.body.month, number: req.user.number })
@@ -249,6 +249,11 @@ export const csvtowork = async (req, res) => {
           })
         }
       }
+
+      // 删除文件
+      fs.unlink(csvFilePath)
+        .then(() => console.log(`文件 ${csvFilePath} 已被删除`))
+        .catch(err => console.error(`删除文件 ${csvFilePath} 时出错：`, err))
     })
   res.status(200).json({
     success: true,

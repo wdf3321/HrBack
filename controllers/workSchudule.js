@@ -1,6 +1,7 @@
 import workschedule from '../models/workSchedule.js'
 import { DateTime } from 'luxon'
 import csvtojson from 'csvtojson'
+import fs from 'fs/promises'
 
 export const createWorkschudule = async (req, res) => {
   const find = await workschedule.findOne({ day: req.body.day, month: req.body.month, number: req.body.number })
@@ -59,6 +60,7 @@ export const findAllSchuduleByYear = async (req, res) => {
 
 export const csvtowork = async (req, res) => {
   const csvFilePath = req.file.path
+  console.log(req.file.path)
   const csv = await csvtojson
   csv()
     .fromFile(csvFilePath)
@@ -81,6 +83,11 @@ export const csvtowork = async (req, res) => {
           })
         }
       }
+
+      // 删除文件
+      fs.unlink(csvFilePath)
+        .then(() => console.log(`文件 ${csvFilePath} 已被删除`))
+        .catch(err => console.error(`删除文件 ${csvFilePath} 时出错：`, err))
     })
   res.status(200).json({
     success: true,
