@@ -213,7 +213,7 @@ export const editVacation = async (req, res) => {
     // ------------------------------------------------
     const results = await userPunchrecords.findOneAndUpdate(
       { _id: req.body._id },
-      { hours: HourSent },
+      { hours: HourSent, break: req.body.breakday, holiday: req.body.holiday },
       { new: true }
     )
 

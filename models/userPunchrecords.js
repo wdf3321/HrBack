@@ -47,10 +47,11 @@ const schema = new Schema(
       type: String,
       default: 0
     },
-    overtimehours: {
-      type: String,
-      default: ''
+    holiday: {
+      type: Boolean,
+      default: false
     },
+    break: { type: Boolean, default: false },
     state: {
       type: String,
       default: '',
