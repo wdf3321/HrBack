@@ -3,7 +3,7 @@ import admin from '../middleware/admin.js'
 // import content from '../middleware/content.js'
 import * as auth from '../middleware/auth.js'
 import { upload } from '../middleware/multer.js'
-import { createVacation, findVacation, findVacationByMonth, findVacationByYear, findAllVacation, findAllVacationByMonth, findAllVacationByYear, checkVacation, offVacation, UserTotalWorkTime, UserTotalWorkTimeByMonth, editVacation, findVacationByMonthLength, csvtowork } from '../controllers/vacation.js'
+import { createVacation, findVacation, findVacationByMonth, findVacationByYear, findAllVacation, findAllVacationByMonth, findAllVacationByYear, checkVacation, offVacation, UserTotalWorkTime, UserTotalWorkTimeByMonth, editVacation, findVacationByMonthLength, csvtowork, calculatetotalwork, findtotalwork } from '../controllers/vacation.js'
 
 const router = Router()
 // 創立打卡紀錄
@@ -26,4 +26,7 @@ router.get('/time/:number/:month', auth.jwt, UserTotalWorkTimeByMonth)
 router.patch('/approve/edittime', auth.jwt, editVacation)
 // csv 匯入
 router.post('/csvtowork', upload, csvtowork)
+// calculate
+router.get('/calculate/:number/:month', auth.jwt, findtotalwork)
+router.post('/calculate/:number/:month', auth.jwt, calculatetotalwork)
 export default router

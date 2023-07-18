@@ -3,6 +3,7 @@ import userPunchrecords from '../models/userPunchrecords.js'
 import { DateTime, Duration } from 'luxon'
 import csvtojson from 'csvtojson'
 import fs from 'fs/promises'
+import calculateHour from '../models/calculateHour.js'
 // ----------------------------------------------
 export const createVacation = async (req, res) => {
   const find = await userPunchrecords.findOne({ day: req.body.day, month: req.body.month, number: req.user.number })
@@ -45,8 +46,20 @@ export const offVacation = async (req, res) => {
     const endTimeString = await req.body.onClockOut
     // const formatString = 'HH:mm'
 
-    const startTime = DateTime.fromObject({ year, month, day, hour: parseInt(startTimeString.split(':')[0]), minute: parseInt(startTimeString.split(':')[1]) })
-    const endTime = DateTime.fromObject({ year, month, day, hour: parseInt(endTimeString.split(':')[0]), minute: parseInt(endTimeString.split(':')[1]) })
+    const startTime = DateTime.fromObject({
+      year,
+      month,
+      day,
+      hour: parseInt(startTimeString.split(':')[0]),
+      minute: parseInt(startTimeString.split(':')[1])
+    })
+    const endTime = DateTime.fromObject({
+      year,
+      month,
+      day,
+      hour: parseInt(endTimeString.split(':')[0]),
+      minute: parseInt(endTimeString.split(':')[1])
+    })
 
     let hours = 0
     let minutes = 0
@@ -70,7 +83,7 @@ export const offVacation = async (req, res) => {
     const formattedHours = Math.abs(hours).toString().padStart(2, '0')
     const formattedMinutes = Math.abs(minutes).toString().padStart(2, '0')
 
-    const sign = (hours < 0 || minutes < 0) ? '-' : '' // 判斷是否為負數
+    const sign = hours < 0 || minutes < 0 ? '-' : '' // 判斷是否為負數
 
     const HourSent = `${sign}${formattedHours}:${formattedMinutes}`
 
@@ -141,7 +154,7 @@ export const UserTotalWorkTime = async (req, res) => {
       totalDuration = totalDuration.plus(duration)
     })
     const totalHours = await Math.floor(totalDuration.as('hours'))
-    const totalMinutes = await Math.floor(totalDuration.as('minutes')) % 60
+    const totalMinutes = (await Math.floor(totalDuration.as('minutes'))) % 60
     const result = await `${totalHours}:${totalMinutes.toString().padStart(2, '0')}`
     res.status(200).json({ success: true, message: result })
   } catch (error) {
@@ -159,7 +172,7 @@ export const UserTotalWorkTimeByMonth = async (req, res) => {
       totalDuration = totalDuration.plus(duration)
     })
     const totalHours = await Math.floor(totalDuration.as('hours'))
-    const totalMinutes = await Math.floor(totalDuration.as('minutes')) % 60
+    const totalMinutes = (await Math.floor(totalDuration.as('minutes'))) % 60
     const result = await `${totalHours}:${totalMinutes.toString().padStart(2, '0')}`
     res.status(200).json({ success: true, message: result })
   } catch (error) {
@@ -169,7 +182,11 @@ export const UserTotalWorkTimeByMonth = async (req, res) => {
 
 export const editVacation = async (req, res) => {
   try {
-    const result = await userPunchrecords.findByIdAndUpdate(req.body._id, { editClockIn: req.body.editClockIn, editClockOut: req.body.editClockOut }, { new: true })
+    const result = await userPunchrecords.findByIdAndUpdate(
+      req.body._id,
+      { editClockIn: req.body.editClockIn, editClockOut: req.body.editClockOut },
+      { new: true }
+    )
     const find = await userPunchrecords.findOne({ _id: req.body._id })
     const day = parseInt(find.day)
     const month = parseInt(find.month)
@@ -177,8 +194,20 @@ export const editVacation = async (req, res) => {
     const startTimeString = find.editClockIn
     const endTimeString = find.editClockOut
 
-    let startTime = DateTime.fromObject({ year, month, day, hour: parseInt(startTimeString.split(':')[0]), minute: parseInt(startTimeString.split(':')[1]) })//eslint-disable-line
-    let endTime = DateTime.fromObject({ year, month, day, hour: parseInt(endTimeString.split(':')[0]), minute: parseInt(endTimeString.split(':')[1]) })
+    const startTime = DateTime.fromObject({
+      year,
+      month,
+      day,
+      hour: parseInt(startTimeString.split(':')[0]),
+      minute: parseInt(startTimeString.split(':')[1])
+    }) //eslint-disable-line
+    let endTime = DateTime.fromObject({
+      year,
+      month,
+      day,
+      hour: parseInt(endTimeString.split(':')[0]),
+      minute: parseInt(endTimeString.split(':')[1])
+    })
 
     if (req.body.breaktime === true) {
       endTime = endTime.minus({ hours: 1 })
@@ -206,7 +235,7 @@ export const editVacation = async (req, res) => {
     const formattedHours = Math.abs(hours).toString().padStart(2, '0')
     const formattedMinutes = Math.abs(minutes).toString().padStart(2, '0')
 
-    const sign = (hours < 0 || minutes < 0) ? '-' : '' // 判断是否为负数
+    const sign = hours < 0 || minutes < 0 ? '-' : '' // 判断是否为负数
 
     const HourSent = `${sign}${formattedHours}:${formattedMinutes}`
 
@@ -221,6 +250,115 @@ export const editVacation = async (req, res) => {
   } catch (error) {
     res.status(500).json({ success: false, message: error.message })
   }
+}
+// -------------------------------------------------------------------------------------------
+// 含加班   台籍正職
+export const calculatetotalwork = async (req, res) => {
+  const find = await userPunchrecords.find({ number: req.params.number, month: req.params.month, year: DateTime.now().year })
+  console.log(find)
+  if (find.length === 0) {
+    return res.status(500).send('沒有紀錄') // 返回 500
+  }
+  const userTeam = '人事'
+  let filteredRecords = find
+
+  if (userTeam !== '人事') {
+    filteredRecords = filteredRecords.filter(
+      (record) => record.team === userTeam
+    )
+  }
+
+  const uniqueNamesSet = new Set(filteredRecords.map((record) => record.name))
+  const uniqueNames = Array.from(uniqueNamesSet)
+
+  const rows = []
+  for (const name of uniqueNames) {
+    const recordsOfThisName = filteredRecords.filter(
+      (record) => record.name === name
+    )
+
+    let totalHours = 0
+    let totalMinutes = 0
+    let totalOvertime8to10Hours = 0
+    let totalOvertime8to10Minutes = 0
+    let totalOvertimeOver10Hours = 0
+    let totalOvertimeOver10Minutes = 0
+
+    recordsOfThisName.forEach(record => {
+      const [hours, minutes] = record.hours.split(':').map(Number)
+
+      if (hours >= 10) {
+        const over10Hours = hours - 10
+        const over10Minutes = minutes
+        totalOvertimeOver10Hours += over10Hours
+        totalOvertimeOver10Minutes += over10Minutes
+        totalOvertime8to10Hours += 2
+      } else if (hours >= 8) {
+        const over8Hours = hours - 8
+        const over8Minutes = minutes
+        totalOvertime8to10Hours += over8Hours
+        totalOvertime8to10Minutes += over8Minutes
+      }
+
+      totalHours += hours
+      totalMinutes += minutes
+    })
+
+    // Handle overflow of minutes
+    if (totalMinutes >= 60) {
+      totalHours += Math.floor(totalMinutes / 60)
+      totalMinutes %= 60
+    }
+
+    if (totalOvertime8to10Minutes >= 60) {
+      totalOvertime8to10Hours += Math.floor(totalOvertime8to10Minutes / 60)
+      totalOvertime8to10Minutes %= 60
+    }
+
+    if (totalOvertimeOver10Minutes >= 60) {
+      totalOvertimeOver10Hours += Math.floor(totalOvertimeOver10Minutes / 60)
+      totalOvertimeOver10Minutes %= 60
+    }
+
+    const formattedTotalHours = String(totalHours).padStart(2, '0')
+    const formattedTotalMinutes = String(totalMinutes).padStart(2, '0')
+    const formattedOvertime8to10 = `${String(totalOvertime8to10Hours).padStart(2, '0')}:${String(totalOvertime8to10Minutes).padStart(2, '0')}`
+    const formattedOvertimeOver10 = `${String(totalOvertimeOver10Hours).padStart(2, '0')}:${String(totalOvertimeOver10Minutes).padStart(2, '0')}`
+    rows.push({
+      name,
+      number: recordsOfThisName[0].number,
+      count: recordsOfThisName.length,
+      hours: `${formattedTotalHours}:${formattedTotalMinutes}`,
+      overtime8to10: formattedOvertime8to10,
+      overtimeOver10: formattedOvertimeOver10
+    })
+
+    const docData = {
+      name,
+      number: recordsOfThisName[0].number,
+      totalhour: `${formattedTotalHours}:${formattedTotalMinutes}`,
+      overhourfirst: formattedOvertime8to10,
+      overhoursecond: formattedOvertimeOver10,
+      team: recordsOfThisName[0].team,
+      year: recordsOfThisName[0].year,
+      month: recordsOfThisName[0].month,
+      break: recordsOfThisName[0].break,
+      holiday: recordsOfThisName[0].holiday
+    }
+
+    // 如果文檔存在，則更新，否則創建新文檔
+    await calculateHour.findOneAndUpdate({
+      name,
+      number: recordsOfThisName[0].number
+    }, docData, { upsert: true })
+
+    res.json(rows)
+  }
+}
+
+export const findtotalwork = async (req, res) => {
+  const result = await calculateHour.findOne({ number: req.params.number, month: req.params.month, year: DateTime.now().year })
+  res.status(200).json({ success: true, message: result })
 }
 
 export const csvtowork = async (req, res) => {
