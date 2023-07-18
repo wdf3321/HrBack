@@ -346,11 +346,11 @@ export const calculatetotalwork = async (req, res) => {
       holiday: recordsOfThisName[0].holiday
     }
 
-    // 如果文檔存在，則更新，否則創建新文檔
     await calculateHour.findOneAndUpdate({
       name,
       number: recordsOfThisName[0].number,
-      month: recordsOfThisName[0].month
+      month: recordsOfThisName[0].month,
+      year: recordsOfThisName[0].year // 新增年份到查詢條件中
     }, docData, { upsert: true })
 
     res.json(rows)

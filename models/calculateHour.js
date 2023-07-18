@@ -14,7 +14,6 @@ const schema = new Schema(
       required: [true, '缺少工號'],
       minlength: [4, '4 個字元以上'],
       maxlength: [20, '20 個字元以下'],
-      unique: true,
       match: [/^[A-Za-z0-9]+$/, '格式錯誤']
     },
     totalhour: {
@@ -59,5 +58,5 @@ const schema = new Schema(
 
   { versionKey: false }
 )
-
+schema.index({ number: 1, month: 1 }, { unique: true })
 export default model('calculatehour', schema)
