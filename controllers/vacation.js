@@ -349,7 +349,8 @@ export const calculatetotalwork = async (req, res) => {
     // 如果文檔存在，則更新，否則創建新文檔
     await calculateHour.findOneAndUpdate({
       name,
-      number: recordsOfThisName[0].number
+      number: recordsOfThisName[0].number,
+      month: recordsOfThisName[0].month
     }, docData, { upsert: true })
 
     res.json(rows)
