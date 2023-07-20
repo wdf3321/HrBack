@@ -20,6 +20,9 @@ const schema = new Schema(
       type: String,
       required: true
     },
+    totaloverhour: {
+      type: String
+    },
     overhourfirst: {
       type: String,
       default: 0

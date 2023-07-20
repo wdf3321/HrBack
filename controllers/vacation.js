@@ -1,4 +1,4 @@
-// import users from '../models/users.js'
+import users from '../models/users.js'
 import userPunchrecords from '../models/userPunchrecords.js'
 import { DateTime, Duration } from 'luxon'
 import csvtojson from 'csvtojson'
@@ -6,14 +6,15 @@ import fs from 'fs/promises'
 import calculateHour from '../models/calculateHour.js'
 // ----------------------------------------------
 export const createVacation = async (req, res) => {
-  const find = await userPunchrecords.findOne({ day: req.body.day, month: req.body.month, number: req.user.number })
+  const find = await userPunchrecords.findOne({ day: req.body.day, month: req.body.month, number: req.body.number })
+  const finduser = await users.findOne({ number: req.body.number })
   if (find) {
     res.status(500).json({ success: false, message: '你今天已打過卡' })
   } else {
     try {
-      const result = userPunchrecords.create({
-        name: req.user.name,
-        number: req.user.number,
+      const result = await userPunchrecords.create({
+        name: finduser.name,
+        number: req.body.number,
         onClockIn: req.body.onClockIn,
         onClockOut: req.body.onClockOut,
         editClockIn: req.body.onClockIn,
@@ -23,7 +24,7 @@ export const createVacation = async (req, res) => {
         day: req.body.day,
         state: req.body.state,
         hours: req.body.hours,
-        team: req.user.team
+        team: finduser.team
       })
       res.status(200).json({ success: true, data: result })
     } catch (error) {
@@ -38,7 +39,7 @@ export const createVacation = async (req, res) => {
 
 export const offVacation = async (req, res) => {
   try {
-    const find = await userPunchrecords.findOne({ day: req.body.day, month: req.body.month, number: req.user.number, year: DateTime.now().year })
+    const find = await userPunchrecords.findOne({ day: req.body.day, month: req.body.month, number: req.body.number, year: DateTime.now().year })
     const day = parseInt(req.body.day)
     const month = parseInt(req.body.month)
     const year = new Date().getFullYear() // 使用當前年份
@@ -89,13 +90,13 @@ export const offVacation = async (req, res) => {
 
     // ------------------------------------------------
     const result = await userPunchrecords.findOneAndUpdate(
-      { day: req.body.day, month: req.body.month, number: req.user.number },
+      { day: req.body.day, month: req.body.month, number: req.body.number },
       { hours: HourSent, onClockOut: req.body.onClockOut },
       { new: true }
     )
-    res.status(200).json({ success: true, message: result })
+    res.status(200).json({ success: true, data: result })
   } catch (error) {
-    res.status(500).json({ success: false, message: error.message })
+    res.status(500).json({ success: false, data: error.message })
   }
 }
 
@@ -255,7 +256,6 @@ export const editVacation = async (req, res) => {
 // 含加班   台籍正職
 export const calculatetotalwork = async (req, res) => {
   const find = await userPunchrecords.find({ number: req.params.number, month: req.params.month, year: DateTime.now().year })
-  console.log(find)
   if (find.length === 0) {
     return res.status(500).send('沒有紀錄') // 返回 500
   }
@@ -284,6 +284,9 @@ export const calculatetotalwork = async (req, res) => {
     let totalOvertimeOver10Hours = 0
     let totalOvertimeOver10Minutes = 0
 
+    let totalOvertimeHours = 0
+    let totalOvertimeMinutes = 0
+
     recordsOfThisName.forEach(record => {
       const [hours, minutes] = record.hours.split(':').map(Number)
 
@@ -293,11 +296,17 @@ export const calculatetotalwork = async (req, res) => {
         totalOvertimeOver10Hours += over10Hours
         totalOvertimeOver10Minutes += over10Minutes
         totalOvertime8to10Hours += 2
+
+        totalOvertimeHours += over10Hours + 2
+        totalOvertimeMinutes += over10Minutes
       } else if (hours >= 8) {
         const over8Hours = hours - 8
         const over8Minutes = minutes
         totalOvertime8to10Hours += over8Hours
         totalOvertime8to10Minutes += over8Minutes
+
+        totalOvertimeHours += over8Hours
+        totalOvertimeMinutes += over8Minutes
       }
 
       totalHours += hours
@@ -320,15 +329,22 @@ export const calculatetotalwork = async (req, res) => {
       totalOvertimeOver10Minutes %= 60
     }
 
+    if (totalOvertimeMinutes >= 60) {
+      totalOvertimeHours += Math.floor(totalOvertimeMinutes / 60)
+      totalOvertimeMinutes %= 60
+    }
+
     const formattedTotalHours = String(totalHours).padStart(2, '0')
     const formattedTotalMinutes = String(totalMinutes).padStart(2, '0')
     const formattedOvertime8to10 = `${String(totalOvertime8to10Hours).padStart(2, '0')}:${String(totalOvertime8to10Minutes).padStart(2, '0')}`
     const formattedOvertimeOver10 = `${String(totalOvertimeOver10Hours).padStart(2, '0')}:${String(totalOvertimeOver10Minutes).padStart(2, '0')}`
+    const formattedOvertime = `${String(totalOvertimeHours).padStart(2, '0')}:${String(totalOvertimeMinutes).padStart(2, '0')}`
     rows.push({
       name,
       number: recordsOfThisName[0].number,
       count: recordsOfThisName.length,
       hours: `${formattedTotalHours}:${formattedTotalMinutes}`,
+      totaloverhour: formattedOvertime,
       overtime8to10: formattedOvertime8to10,
       overtimeOver10: formattedOvertimeOver10
     })
@@ -337,6 +353,7 @@ export const calculatetotalwork = async (req, res) => {
       name,
       number: recordsOfThisName[0].number,
       totalhour: `${formattedTotalHours}:${formattedTotalMinutes}`,
+      totaloverhour: formattedOvertime,
       overhourfirst: formattedOvertime8to10,
       overhoursecond: formattedOvertimeOver10,
       team: recordsOfThisName[0].team,
@@ -352,9 +369,9 @@ export const calculatetotalwork = async (req, res) => {
       month: recordsOfThisName[0].month,
       year: recordsOfThisName[0].year // 新增年份到查詢條件中
     }, docData, { upsert: true })
-
-    res.json(rows)
   }
+
+  res.json(rows)
 }
 
 export const findtotalwork = async (req, res) => {
@@ -362,6 +379,12 @@ export const findtotalwork = async (req, res) => {
   res.status(200).json({ success: true, message: result })
 }
 
+export const updateworktime = async (req, res) => {
+  const result = await calculateHour.findOneAndUpdate({ number: req.body.number, month: req.body.month, year: DateTime.now().year }, req.body, { new: true })
+  res.status(200).json({ success: true, message: result })
+}
+
+// -----------------------------------------------------------------------
 export const csvtowork = async (req, res) => {
   const csvFilePath = req.file.path
   const csv = await csvtojson

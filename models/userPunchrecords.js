@@ -54,7 +54,7 @@ const schema = new Schema(
     break: { type: Boolean, default: false },
     state: {
       type: String,
-      default: '',
+      default: '審核中',
       required: false,
       enum: {
         values: ['審核中', '已審核', '已退回']
