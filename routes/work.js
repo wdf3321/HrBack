@@ -7,8 +7,8 @@ import { createVacation, findVacation, findVacationByMonth, findVacationByYear, 
 
 const router = Router()
 // 創立打卡紀錄
-router.post('/on', auth.jwt, createVacation)// 上班
-router.patch('/off', auth.jwt, offVacation)// 下班
+router.post('/on', createVacation)// 上班
+router.patch('/off', offVacation)// 下班
 // 查自己,某人打卡紀錄
 router.get('/all', auth.jwt, admin, findAllVacation)
 router.get('/month/:month', auth.jwt, findAllVacationByMonth)
