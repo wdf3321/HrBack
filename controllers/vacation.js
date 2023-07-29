@@ -4,6 +4,12 @@ import { DateTime, Duration } from 'luxon'
 import csvtojson from 'csvtojson'
 import fs from 'fs/promises'
 import calculateHour from '../models/calculateHour.js'
+import 'dotenv/config'
+
+const today = DateTime.now()
+const year = today.year
+const month = today.month.toString().padStart(2, '0')
+// const day = today.day
 // ----------------------------------------------
 export const createVacation = async (req, res) => {
   const find = await userPunchrecords.findOne({ day: req.body.day, month: req.body.month, number: req.body.number })
@@ -39,10 +45,9 @@ export const createVacation = async (req, res) => {
 
 export const offVacation = async (req, res) => {
   try {
-    const find = await userPunchrecords.findOne({ day: req.body.day, month: req.body.month, number: req.body.number, year: DateTime.now().year })
+    const find = await userPunchrecords.findOne({ day: req.body.day, month: req.body.month, number: req.body.number, year })
     const day = parseInt(req.body.day)
     const month = parseInt(req.body.month)
-    const year = new Date().getFullYear() // 使用當前年份
     const startTimeString = await find.onClockIn
     const endTimeString = await req.body.onClockOut
     // const formatString = 'HH:mm'
@@ -101,7 +106,8 @@ export const offVacation = async (req, res) => {
 }
 
 export const findVacation = async (req, res) => {
-  const result = await userPunchrecords.find({ number: req.params.number, month: DateTime.now().month, year: DateTime.now().year })
+  const result = await userPunchrecords.find({ number: req.params.number, month, year })
+  console.log(result)
   res.status(200).json({ success: true, message: '', result })
 }
 export const findVacationByMonth = async (req, res) => {
@@ -121,7 +127,7 @@ export const findAllVacation = async (req, res) => {
   res.status(200).json({ success: true, message: result })
 }
 export const findAllVacationByMonth = async (req, res) => {
-  const result = await userPunchrecords.find({ month: req.params.month, year: DateTime.now().year })
+  const result = await userPunchrecords.find({ month: req.params.month, year })
   res.status(200).json({ success: true, message: result })
 }
 export const findAllVacationByYear = async (req, res) => {
@@ -147,7 +153,7 @@ export const checkVacation = async (req, res) => {
 
 export const UserTotalWorkTime = async (req, res) => {
   try {
-    const userPunchRecords = await userPunchrecords.find({ number: req.user.number, month: DateTime.now().month })
+    const userPunchRecords = await userPunchrecords.find({ number: req.user.number, month })
     let totalDuration = await Duration.fromObject({ hours: 0, minutes: 0 })
     await userPunchRecords.forEach(record => {
       const [hours, minutes] = record.hours.split(':').map(Number)
@@ -255,7 +261,7 @@ export const editVacation = async (req, res) => {
 // -------------------------------------------------------------------------------------------
 // 含加班   台籍正職
 export const calculatetotalwork = async (req, res) => {
-  const find = await userPunchrecords.find({ number: req.params.number, month: req.params.month, year: DateTime.now().year })
+  const find = await userPunchrecords.find({ number: req.params.number, month: req.params.month, year })
   if (find.length === 0) {
     return res.status(500).send('沒有紀錄') // 返回 500
   }
@@ -263,19 +269,15 @@ export const calculatetotalwork = async (req, res) => {
   let filteredRecords = find
 
   if (userTeam !== '人事') {
-    filteredRecords = filteredRecords.filter(
-      (record) => record.team === userTeam
-    )
+    filteredRecords = filteredRecords.filter(record => record.team === userTeam)
   }
 
-  const uniqueNamesSet = new Set(filteredRecords.map((record) => record.name))
+  const uniqueNamesSet = new Set(filteredRecords.map(record => record.name))
   const uniqueNames = Array.from(uniqueNamesSet)
 
   const rows = []
   for (const name of uniqueNames) {
-    const recordsOfThisName = filteredRecords.filter(
-      (record) => record.name === name
-    )
+    const recordsOfThisName = filteredRecords.filter(record => record.name === name)
 
     let totalHours = 0
     let totalMinutes = 0
@@ -363,24 +365,30 @@ export const calculatetotalwork = async (req, res) => {
       holiday: recordsOfThisName[0].holiday
     }
 
-    await calculateHour.findOneAndUpdate({
-      name,
-      number: recordsOfThisName[0].number,
-      month: recordsOfThisName[0].month,
-      year: recordsOfThisName[0].year // 新增年份到查詢條件中
-    }, docData, { upsert: true })
+    await calculateHour.findOneAndUpdate(
+      {
+        name,
+        number: recordsOfThisName[0].number,
+        month: recordsOfThisName[0].month,
+        year: recordsOfThisName[0].year // 新增年份到查詢條件中
+      },
+      docData,
+      { upsert: true }
+    )
   }
 
   res.json(rows)
 }
 
 export const findtotalwork = async (req, res) => {
-  const result = await calculateHour.findOne({ number: req.params.number, month: req.params.month, year: DateTime.now().year })
+  const result = await calculateHour.findOne({ number: req.params.number, month: req.params.month, year })
   res.status(200).json({ success: true, message: result })
 }
 
 export const updateworktime = async (req, res) => {
-  const result = await calculateHour.findOneAndUpdate({ number: req.body.number, month: req.body.month, year: DateTime.now().year }, req.body, { new: true })
+  const result = await calculateHour.findOneAndUpdate({ number: req.body.number, month: req.body.month, year }, req.body, {
+    new: true
+  })
   res.status(200).json({ success: true, message: result })
 }
 
@@ -422,3 +430,5 @@ export const csvtowork = async (req, res) => {
     message: '已收到'
   })
 }
+
+// ----------------------------------------------------------------

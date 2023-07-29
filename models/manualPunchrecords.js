@@ -8,7 +8,7 @@ const schema = new Schema(
       type: String,
       required: [true, '缺少類型'],
       enum: {
-        values: ['加班', '補打上班', '補打下班']
+        values: ['中午未休', '一般加班', '國定假日加班', '休假日加班', '例假日加班']
       }
     },
     name: {
@@ -24,11 +24,6 @@ const schema = new Schema(
       required: true,
       default: ''
     },
-    description: {
-      type: String,
-      required: false,
-      default: ''
-    },
     year: {
       type: String,
       default: today.year
@@ -36,13 +31,11 @@ const schema = new Schema(
     },
     month: {
       type: String,
-      default: today.month
-      // required: [true, '請輸入月']
+      default: today.month.toString().padStart(2, '0')
     },
     day: {
       type: String,
       default: today.day
-      // required: [true, '請輸入日']
     },
     onClockIn: {
       type: String,
@@ -54,11 +47,20 @@ const schema = new Schema(
     },
     hours: {
       type: String,
-      default: 0
+      default: ''
+    },
+    overhourfirst: {
+      type: String
+    },
+    overhoursecond: {
+      type: String
+    },
+    overhourthree: {
+      type: String
     },
     state: {
       type: String,
-      default: '',
+      default: '審核中',
       required: false,
       enum: {
         values: ['審核中', '已審核', '已退回']

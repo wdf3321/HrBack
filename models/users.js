@@ -18,8 +18,7 @@ const schema = new Schema(
       match: [/^[A-Za-z0-9]+$/, '格式錯誤']
     },
     password: {
-      type: String,
-      required: true
+      type: String
     },
     tokens: {
       type: [String],
@@ -67,6 +66,7 @@ const schema = new Schema(
 schema.pre('save', function (next) {
   const user = this
   if (user.isModified('password')) {
+    console.log(user.password)
     if (user.password.length >= 4 && user.password.length <= 20) {
       user.password = bcryptjs.hashSync(user.password, 10)
     } else {

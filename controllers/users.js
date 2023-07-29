@@ -45,7 +45,8 @@ export const login = async (req, res) => {
         team: req.user.team,
         year: req.user.year,
         month: req.user.month,
-        day: req.user.day
+        day: req.user.day,
+        image: req.user.image
       }
     })
   } catch (error) {
