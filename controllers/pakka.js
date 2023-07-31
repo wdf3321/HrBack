@@ -45,23 +45,23 @@ export const getpunch = async () => {
       })
     }
     for (let i = 0; i < punchRecord.length; i++) {
-      const date = DateTime.fromISO(punchRecord[i].timemark)
+      const currentDate = DateTime.local(parseInt(punchRecord[i].year), parseInt(punchRecord[i].month), parseInt(punchRecord[i].day))
+      const yesterday = currentDate.minus({ days: 1 })
       const finduser = await users.findOne({ number: punchRecord[i].emp_id })
       // 搜當天打卡
       const findpunch = await userPunchrecords.findOne({
         number: punchRecord[i].emp_id,
-        year: punchRecord[i].year,
-        month: punchRecord[i].month,
-        day: punchRecord[i].day
+        year: currentDate.year,
+        month: currentDate.month.toString().padStart(2, '0'),
+        day: currentDate.day
       })
       // 搜昨天打卡
       const findpunchyesterday = await userPunchrecords.findOne({
         number: punchRecord[i].emp_id,
-        year: punchRecord[i].year,
-        month: punchRecord[i].month,
-        day: date.minus({ days: 1 }).toFormat('dd')
+        year: yesterday.year,
+        month: yesterday.month.toString().padStart(2, '0'),
+        day: yesterday.day
       })
-      console.log(finduser, findpunch, findpunchyesterday)
       await handleClockIn(punchRecord[i], finduser, findpunch)
       await handleClockOut(punchRecord[i], finduser, findpunch, findpunchyesterday)
     }
@@ -182,7 +182,7 @@ export const handleClockIn = async (record, finduser, findpunch) => {
 export const handleClockOut = async (record, finduser, findpunch, findpunchyesterday) => {
   // 下班打卡
   if (finduser.number === record.emp_id && record.act === 2) {
-    if (findpunchyesterday && !findpunch) {
+    if (findpunchyesterday) {
       await userPunchrecords.updateOne(
         { _id: findpunchyesterday._id },
         {
@@ -191,7 +191,7 @@ export const handleClockOut = async (record, finduser, findpunch, findpunchyeste
           hours: hourcalculate(findpunchyesterday.onClockIn, record.time)
         }
       )
-    } else if (findpunchyesterday && findpunch) {
+    } else if (findpunch) {
       await userPunchrecords.updateOne(
         { _id: findpunch._id },
         {
@@ -201,6 +201,15 @@ export const handleClockOut = async (record, finduser, findpunch, findpunchyeste
         }
       )
     } else if (!findpunchyesterday && findpunch) {
+      await userPunchrecords.updateOne(
+        { _id: findpunch._id },
+        {
+          onClockOut: record.time,
+          editClockOut: record.time,
+          hours: hourcalculate(findpunch.onClockIn, record.time)
+        }
+      )
+    } else {
       await userPunchrecords.updateOne(
         { _id: findpunch._id },
         {
