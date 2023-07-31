@@ -56,6 +56,9 @@ const schema = new Schema(
     },
     holiday: {
       type: String
+    },
+    delay: {
+      type: String
     }
   },
 

@@ -60,6 +60,7 @@ export const getpunch = async () => {
         month: punchRecord[i].month,
         day: punchRecord[i].day - 1
       })
+      // 上班打卡
       if (findpunch) {
         console.log(findpunch.name + '已有紀錄')
       } else if (finduser.number === punchRecord[i].emp_id && punchRecord[i].act === 1) {
@@ -73,6 +74,7 @@ export const getpunch = async () => {
           day: punchRecord[i].day,
           team: finduser.team
         })
+        // 下班打卡
       } else if (finduser.number === punchRecord[i].emp_id && punchRecord[i].act === 2) {
         if (findpunchyesterday && !findpunch) {
           await userPunchrecords.updateOne(
@@ -96,7 +98,7 @@ export const getpunch = async () => {
       }
     }
   } catch (error) {
-    console.log(error)
+    console.error(error)
   }
 }
 
@@ -122,8 +124,7 @@ export const getmember = async () => {
           number: staff.emp_id,
           password: staff.emp_id,
           image: 'https://ent.pakka.ai' + staff.avatar || '',
-          role: 0,
-          timerecord: []
+          role: 0
         })
       } catch (error) {
         if (error.name !== 'MongoServerError' || error.code !== 11000) {

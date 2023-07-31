@@ -51,13 +51,9 @@ const schema = new Schema(
     day: {
       type: String
     },
-    timerecord: {
-      type: [
-        {
-          date: { type: String },
-          time: { type: String }
-        }
-      ]
+    // 部門
+    depart: {
+      type: String
     }
   },
   { versionKey: false }
