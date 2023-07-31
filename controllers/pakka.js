@@ -45,6 +45,7 @@ export const getpunch = async () => {
       })
     }
     for (let i = 0; i < punchRecord.length; i++) {
+      const date = DateTime.fromISO(punchRecord[i].timemark)
       const finduser = await users.findOne({ number: punchRecord[i].emp_id })
       // 搜當天打卡
       const findpunch = await userPunchrecords.findOne({
@@ -58,46 +59,11 @@ export const getpunch = async () => {
         number: punchRecord[i].emp_id,
         year: punchRecord[i].year,
         month: punchRecord[i].month,
-        day: punchRecord[i].day - 1
+        day: date.minus({ days: 1 }).toFormat('dd')
       })
-      // 上班打卡
-      if (finduser.number === punchRecord[i].emp_id && punchRecord[i].act === 1) {
-        if (findpunch) {
-          console.log(findpunch.name + '已有紀錄')
-        } else {
-          await userPunchrecords.create({
-            name: finduser.name,
-            number: finduser.number,
-            onClockIn: punchRecord[i].time,
-            editClockIn: punchRecord[i].time,
-            year: punchRecord[i].year,
-            month: punchRecord[i].month,
-            day: punchRecord[i].day,
-            team: finduser.team
-          })
-        }
-        // 下班打卡
-      } else if (finduser.number === punchRecord[i].emp_id && punchRecord[i].act === 2) {
-        if (findpunchyesterday && !findpunch) {
-          await userPunchrecords.updateOne(
-            { _id: findpunchyesterday._id },
-            {
-              onClockOut: punchRecord[i].time,
-              editClockOut: punchRecord[i].time,
-              hours: hourcalculate(findpunchyesterday.onClockIn, punchRecord[i].time)
-            }
-          )
-        } else if (findpunchyesterday && findpunch) {
-          await userPunchrecords.updateOne(
-            { _id: findpunch._id },
-            {
-              onClockOut: punchRecord[i].time,
-              editClockOut: punchRecord[i].time,
-              hours: hourcalculate(findpunch.onClockIn, punchRecord[i].time)
-            }
-          )
-        }
-      }
+      console.log(finduser, findpunch, findpunchyesterday)
+      await handleClockIn(punchRecord[i], finduser, findpunch)
+      await handleClockOut(punchRecord[i], finduser, findpunch, findpunchyesterday)
     }
   } catch (error) {
     console.error(error)
@@ -190,4 +156,59 @@ const hourcalculate = (val1, val2) => {
 
   const HourSent = `${sign}${formattedHours}:${formattedMinutes}`
   return HourSent
+}
+
+// ------------------------------------------------------------------------------------------------
+export const handleClockIn = async (record, finduser, findpunch) => {
+  // 上班打卡
+  if (finduser.number === record.emp_id && record.act === 1) {
+    if (findpunch) {
+      console.log(findpunch.name + '已有紀錄')
+    } else {
+      await userPunchrecords.create({
+        name: finduser.name,
+        number: finduser.number,
+        onClockIn: record.time,
+        editClockIn: record.time,
+        year: record.year,
+        month: record.month,
+        day: record.day,
+        team: finduser.team
+      })
+    }
+  }
+}
+
+export const handleClockOut = async (record, finduser, findpunch, findpunchyesterday) => {
+  // 下班打卡
+  if (finduser.number === record.emp_id && record.act === 2) {
+    if (findpunchyesterday && !findpunch) {
+      await userPunchrecords.updateOne(
+        { _id: findpunchyesterday._id },
+        {
+          onClockOut: record.time,
+          editClockOut: record.time,
+          hours: hourcalculate(findpunchyesterday.onClockIn, record.time)
+        }
+      )
+    } else if (findpunchyesterday && findpunch) {
+      await userPunchrecords.updateOne(
+        { _id: findpunch._id },
+        {
+          onClockOut: record.time,
+          editClockOut: record.time,
+          hours: hourcalculate(findpunch.onClockIn, record.time)
+        }
+      )
+    } else if (!findpunchyesterday && findpunch) {
+      await userPunchrecords.updateOne(
+        { _id: findpunch._id },
+        {
+          onClockOut: record.time,
+          editClockOut: record.time,
+          hours: hourcalculate(findpunch.onClockIn, record.time)
+        }
+      )
+    }
+  }
 }
