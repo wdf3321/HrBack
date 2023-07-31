@@ -61,19 +61,21 @@ export const getpunch = async () => {
         day: punchRecord[i].day - 1
       })
       // 上班打卡
-      if (findpunch) {
-        console.log(findpunch.name + '已有紀錄')
-      } else if (finduser.number === punchRecord[i].emp_id && punchRecord[i].act === 1) {
-        await userPunchrecords.create({
-          name: finduser.name,
-          number: finduser.number,
-          onClockIn: punchRecord[i].time,
-          editClockIn: punchRecord[i].time,
-          year: punchRecord[i].year,
-          month: punchRecord[i].month,
-          day: punchRecord[i].day,
-          team: finduser.team
-        })
+      if (finduser.number === punchRecord[i].emp_id && punchRecord[i].act === 1) {
+        if (findpunch) {
+          console.log(findpunch.name + '已有紀錄')
+        } else {
+          await userPunchrecords.create({
+            name: finduser.name,
+            number: finduser.number,
+            onClockIn: punchRecord[i].time,
+            editClockIn: punchRecord[i].time,
+            year: punchRecord[i].year,
+            month: punchRecord[i].month,
+            day: punchRecord[i].day,
+            team: finduser.team
+          })
+        }
         // 下班打卡
       } else if (finduser.number === punchRecord[i].emp_id && punchRecord[i].act === 2) {
         if (findpunchyesterday && !findpunch) {

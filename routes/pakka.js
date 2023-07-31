@@ -7,5 +7,5 @@ const hour = schedule.scheduleJob('*/5 * * * * ', function () {
   getpunch()
   getmember()
 })
-
+getpunch()
 export default router
