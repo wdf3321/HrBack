@@ -69,6 +69,9 @@ const schema = new Schema(
     manager: {
       type: String,
       required: false
+    },
+    createtime: {
+      type: String
     }
   },
   { versionKey: false }

@@ -2,10 +2,10 @@ import manualPunchrecords from '../models/manualPunchrecords.js'
 
 import { Duration, DateTime } from 'luxon'
 // -------------------------------------
-// const today = DateTime.now()
-// const year = today.year
-// const month = today.month.toString().padStart(2, '0')
-// const day = today.day
+const today = DateTime.now()
+const year1 = today.year
+const month1 = today.month.toString().padStart(2, '0')
+const day1 = today.day.toString().padStart(2, '0')
 
 export const create = async (req, res) => {
   const { type, name, number, title, onClockIn, onClockOut, year, month, day } = req.body
@@ -25,7 +25,8 @@ export const create = async (req, res) => {
     hours: totalHours,
     overhourfirst,
     overhoursecond,
-    overhourthree // spread overhours object to assign overhourfirst, overhoursecond, and overhourthree
+    overhourthree, // spread overhours object to assign overhourfirst, overhoursecond, and overhourthree
+    createtime: year1 + month1 + day1
   })
 
   res.status(200).json({ success: true, message: result })
@@ -33,18 +34,25 @@ export const create = async (req, res) => {
 
 export const approve = async (req, res) => {
   const result = await manualPunchrecords.findOneAndUpdate({
-    _id: req.body._id,
-    name: req.body.name,
-    number: req.body.number
+    _id: req.body._id
   }, {
     state: '已審核'
   }, { new: true })
   res.status(200).json({ success: true, message: result })
 }
 
+export const getAllOvertime = async (req, res) => {
+  const result = await manualPunchrecords.find({ state: '審核中' })
+  res.status(200).json({ success: true, message: result })
+}
+
 export const getSelect = async (req, res) => {
   const teamEnumValues = manualPunchrecords.schema.path('type').enumValues
   res.json(teamEnumValues)
+}
+
+export const edit = async (req, res) => {
+const find = await manualPunchrecords.findOneAndUpdate({ _id: req.body._id },{})
 }
 
 const calculateOverhour = async (val1, val2, type) => {
