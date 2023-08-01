@@ -1,3 +1,4 @@
+import 'dotenv/config'
 import axios from 'axios'
 import FormData from 'form-data'
 import { DateTime } from 'luxon'
@@ -84,16 +85,17 @@ export const getmember = async () => {
     const { data } = await axios.post('https://ent.pakka.ai/api/staffs/list', form2, {
       headers: { 'User-Agent': getRandomUserAgent() }
     })
-    staffs.push(data.staffs)
     for (const staff of data.staffs) {
       try {
-        await users.create({
-          name: staff.full_name,
-          number: staff.emp_id,
-          password: staff.emp_id,
-          image: 'https://ent.pakka.ai' + staff.avatar || '',
-          role: 0
-        })
+        if (staff.team_name === process.env.team_name) {
+          await users.create({
+            name: staff.full_name,
+            number: staff.emp_id,
+            password: staff.emp_id,
+            image: 'https://ent.pakka.ai' + staff.avatar || '',
+            role: 0
+          })
+        }
       } catch (error) {
         if (error.name !== 'MongoServerError' || error.code !== 11000) {
           console.error(error) // log unexpected errors
@@ -106,7 +108,7 @@ export const getmember = async () => {
 
 // full_name  emp_id
 
-// 時間計算 function
+// 總時間計算 function
 const hourcalculate = (val1, val2) => {
   const day = today.day
   const month = today.month
@@ -182,7 +184,7 @@ export const handleClockIn = async (record, finduser, findpunch) => {
 export const handleClockOut = async (record, finduser, findpunch, findpunchyesterday) => {
   // 下班打卡
   if (finduser.number === record.emp_id && record.act === 2) {
-    if (findpunchyesterday) {
+    if (findpunchyesterday && !findpunch) {
       await userPunchrecords.updateOne(
         { _id: findpunchyesterday._id },
         {
@@ -191,7 +193,7 @@ export const handleClockOut = async (record, finduser, findpunch, findpunchyeste
           hours: hourcalculate(findpunchyesterday.onClockIn, record.time)
         }
       )
-    } else if (findpunch) {
+    } else if (!findpunchyesterday && findpunch) {
       await userPunchrecords.updateOne(
         { _id: findpunch._id },
         {
@@ -200,7 +202,7 @@ export const handleClockOut = async (record, finduser, findpunch, findpunchyeste
           hours: hourcalculate(findpunch.onClockIn, record.time)
         }
       )
-    } else if (!findpunchyesterday && findpunch) {
+    } else if (findpunchyesterday && findpunch) {
       await userPunchrecords.updateOne(
         { _id: findpunch._id },
         {
