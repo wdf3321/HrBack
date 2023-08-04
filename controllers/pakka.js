@@ -33,38 +33,48 @@ export const getpunch = async () => {
     const punchRecord = []
     for (let i = 0; i < data.formated_punches.length; i++) {
       const timemark = data.formated_punches[i].timemark
-      punchRecord.push({
-        timemark,
-        emp_id: data.formated_punches[i].emp_id,
-        display_name: data.formated_punches[i].display_name,
-        act: data.formated_punches[i].act,
-        location_id: data.formated_punches[i].location_id,
-        year: timemark.substring(0, 4),
-        month: timemark.substring(5, 7),
-        day: timemark.substring(8, 10),
-        time: timemark.substring(11, 16)
-      })
+      if (data.formated_punches[i].team_id === process.env.team_name) {
+        punchRecord.push({
+          timemark,
+          emp_id: data.formated_punches[i].emp_id,
+          display_name: data.formated_punches[i].display_name,
+          act: data.formated_punches[i].act,
+          location_id: data.formated_punches[i].location_id,
+          year: timemark.substring(0, 4),
+          month: timemark.substring(5, 7),
+          day: timemark.substring(8, 10),
+          time: timemark.substring(11, 16),
+          team_id: data.formated_punches[i].team_id
+        })
+      }
     }
     for (let i = 0; i < punchRecord.length; i++) {
       const currentDate = DateTime.local(parseInt(punchRecord[i].year), parseInt(punchRecord[i].month), parseInt(punchRecord[i].day))
       const yesterday = currentDate.minus({ days: 1 })
+      if (punchRecord[i].team_id !== process.env.team_name) continue
       const finduser = await users.findOne({ number: punchRecord[i].emp_id })
+      console.log(currentDate.year, currentDate.month, currentDate.day)
       // 搜當天打卡
       const findpunch = await userPunchrecords.findOne({
         number: punchRecord[i].emp_id,
         year: currentDate.year,
         month: currentDate.month.toString().padStart(2, '0'),
-        day: currentDate.day
+        day: currentDate.day.toString().padStart(2, '0')
       })
+
       // 搜昨天打卡
       const findpunchyesterday = await userPunchrecords.findOne({
         number: punchRecord[i].emp_id,
         year: yesterday.year,
         month: yesterday.month.toString().padStart(2, '0'),
-        day: yesterday.day
+        day: yesterday.day.toString().padStart(2, '0')
       })
-      await handleClockIn(punchRecord[i], finduser, findpunch)
-      await handleClockOut(punchRecord[i], finduser, findpunch, findpunchyesterday)
+      console.log(findpunch, findpunchyesterday)
+      if (punchRecord[i].act === 1) {
+        await handleClockIn(punchRecord[i], finduser, findpunch)
+      } else if (punchRecord[i].act === 2) {
+        await handleClockOut(punchRecord[i], finduser, findpunch, findpunchyesterday)
+      }
     }
   } catch (error) {
     console.error(error)
@@ -165,8 +175,15 @@ export const handleClockIn = async (record, finduser, findpunch) => {
   // 上班打卡
   if (finduser.number === record.emp_id && record.act === 1) {
     if (findpunch) {
-      console.log(findpunch.name + '已有紀錄')
+      console.log(finduser.name + '已有紀錄')
     } else {
+      console.log('没有找到打卡记录，创建新的记录。', {
+        name: finduser.name,
+        number: finduser.number,
+        year: record.year,
+        month: record.month,
+        day: record.day
+      })
       await userPunchrecords.create({
         name: finduser.name,
         number: finduser.number,
@@ -212,14 +229,7 @@ export const handleClockOut = async (record, finduser, findpunch, findpunchyeste
         }
       )
     } else {
-      await userPunchrecords.updateOne(
-        { _id: findpunch._id },
-        {
-          onClockOut: record.time,
-          editClockOut: record.time,
-          hours: hourcalculate(findpunch.onClockIn, record.time)
-        }
-      )
+      throw new Error('No punch record found')
     }
   }
 }

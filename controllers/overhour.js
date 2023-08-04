@@ -52,7 +52,7 @@ export const getSelect = async (req, res) => {
 }
 
 export const edit = async (req, res) => {
-const find = await manualPunchrecords.findOneAndUpdate({ _id: req.body._id },{})
+  const find = await manualPunchrecords.findOneAndUpdate({ _id: req.body._id }, {})
 }
 
 const calculateOverhour = async (val1, val2, type) => {
