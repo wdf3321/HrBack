@@ -1,4 +1,4 @@
-import 'dotenv/config'
+import dotenv from 'dotenv'
 import express from 'express'
 import mongoose from 'mongoose'
 import cors from 'cors'
@@ -10,6 +10,7 @@ import overhourRoute from './routes/overhour.js'
 import './passport/passport.js'
 import { fileURLToPath } from 'url'
 import { dirname, join } from 'path'
+dotenv.config({ path: `.env.${process.env.NODE_ENV}` })
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = dirname(__filename)
