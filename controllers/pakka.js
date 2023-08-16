@@ -24,7 +24,9 @@ const getRandomUserAgent = () => {
 const form = new FormData()
 form.append('company_token', process.env.company_token)
 
-export const getpunch = async () => {
+export const getpunch = async (retryCount = 0) => {
+  const MAX_RETRIES = 10
+  const RETRY_INTERVAL = 5000
   console.log('getting punch...')
   try {
     const { data } = await axios.post('https://ent.pakka.ai/api/punches/fetch', form, {
@@ -78,6 +80,14 @@ export const getpunch = async () => {
     }
   } catch (error) {
     console.error(error)
+    if (retryCount < MAX_RETRIES) {
+      console.log(`Retrying in ${RETRY_INTERVAL / 1000} seconds...`)
+      await new Promise(resolve => setTimeout(resolve, RETRY_INTERVAL))
+      return getpunch(retryCount + 1) // 递归调用，并增加重试次数
+    } else {
+      console.log('Max retries reached. Aborting.')
+      // 在这里可以选择抛出错误或采取其他处理措施
+    }
   }
 }
 
@@ -110,6 +120,9 @@ export const getmember = async () => {
         if (error.name !== 'MongoServerError' || error.code !== 11000) {
           console.error(error) // log unexpected errors
         }
+        console.error(error)
+        await new Promise(resolve => setTimeout(resolve, 5000))
+        return getmember()
         // if it's a MongoDB duplicate key error, just skip and continue with the next staff
       }
     }

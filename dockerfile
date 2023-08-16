@@ -4,6 +4,7 @@ WORKDIR /app
 # COPY fullchain.crt /app
 COPY package*.json ./
 RUN npm i
+RUN npm i -g forever
 COPY . .
 EXPOSE 4000
-CMD ["npm","run","start"]
+CMD ["forever","index.js","4000"]

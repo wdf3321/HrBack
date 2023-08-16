@@ -15,7 +15,10 @@ dotenv.config({ path: `.env.${process.env.NODE_ENV}` })
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = dirname(__filename)
 
-mongoose.connect(process.env.DB_URL)
+mongoose.connect(process.env.DB_URL, {
+  keepAlive: true, // 設置 keepAlive 為 true
+  keepAliveInitialDelay: 30000
+})// 可選：指定 keep-alive 延遲（毫秒）)
 mongoose.set('sanitizeFilter', true)
 
 const app = express()
