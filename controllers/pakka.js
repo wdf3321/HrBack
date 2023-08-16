@@ -26,7 +26,7 @@ form.append('company_token', process.env.company_token)
 
 export const getpunch = async (retryCount = 0) => {
   const MAX_RETRIES = 10
-  const RETRY_INTERVAL = 5000
+  const RETRY_INTERVAL = 50000
   console.log('getting punch...')
   try {
     const { data } = await axios.post('https://ent.pakka.ai/api/punches/fetch', form, {
@@ -242,7 +242,7 @@ export const handleClockOut = async (record, finduser, findpunch, findpunchyeste
         }
       )
     } else {
-      throw new Error('No punch record found')
+      console.log('No punch record found')
     }
   }
 }
