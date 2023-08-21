@@ -29,13 +29,13 @@ export const getpunch = async (retryCount = 0) => {
   const RETRY_INTERVAL = 50000
   console.log('getting punch...')
   try {
-    const { data } = await axios.post('https://ent.pakka.ai/api/punches/fetch', form, {
+    const { data } = await axios.post('https://ent.pakka.ai/api/punches/fetch_time', form, {
       headers: { 'User-Agent': getRandomUserAgent() }
     })
     const punchRecord = []
     for (let i = 0; i < data.formated_punches.length; i++) {
       const timemark = data.formated_punches[i].timemark
-      if (data.formated_punches[i].team_id === process.env.team_name) {
+      if (data.formated_punches[i].location_id === process.env.team_name) {
         punchRecord.push({
           timemark,
           emp_id: data.formated_punches[i].emp_id,
@@ -53,7 +53,7 @@ export const getpunch = async (retryCount = 0) => {
     for (let i = 0; i < punchRecord.length; i++) {
       const currentDate = DateTime.local(parseInt(punchRecord[i].year), parseInt(punchRecord[i].month), parseInt(punchRecord[i].day))
       const yesterday = currentDate.minus({ days: 1 })
-      if (punchRecord[i].team_id !== process.env.team_name) continue
+      if (punchRecord[i].location_id !== process.env.team_name) continue
       const finduser = await users.findOne({ number: punchRecord[i].emp_id })
       console.log(currentDate.year, currentDate.month, currentDate.day)
       // 搜當天打卡
@@ -190,13 +190,7 @@ export const handleClockIn = async (record, finduser, findpunch) => {
     if (findpunch) {
       console.log(finduser.name + '已有紀錄')
     } else {
-      console.log('没有找到打卡记录，创建新的记录。', {
-        name: finduser.name,
-        number: finduser.number,
-        year: record.year,
-        month: record.month,
-        day: record.day
-      })
+      console.log('找不到打卡紀錄，創建新的紀錄。')
       await userPunchrecords.create({
         name: finduser.name,
         number: finduser.number,
