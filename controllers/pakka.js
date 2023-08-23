@@ -73,7 +73,11 @@ export const getpunch = async (retryCount = 0) => {
       })
       console.log(findpunch, findpunchyesterday)
       if (punchRecord[i].act === 1) {
-        await handleClockIn(punchRecord[i], finduser, findpunch)
+        try {
+          await handleClockIn(punchRecord[i], finduser, findpunch)
+        } catch (error) {
+          console.error('Error handling clock-in:', error.message)
+        }
       } else if (punchRecord[i].act === 2) {
         await handleClockOut(punchRecord[i], finduser, findpunch, findpunchyesterday)
       }
@@ -99,31 +103,31 @@ form2.append('account_token', process.env.account_token)
 
 export const getmember = async () => {
   const staffs = []
+
   setTimeout(async () => {
     console.log('getting member...')
     staffs.splice(0, staffs.length)
     const { data } = await axios.post('https://ent.pakka.ai/api/staffs/list', form2, {
       headers: { 'User-Agent': getRandomUserAgent() }
     })
+
     for (const staff of data.staffs) {
+      if (staff.team_name !== process.env.team_name) {
+        continue // 如果不是我們要的team，則直接繼續下一次循環
+      }
       try {
-        if (staff.team_name === process.env.team_name) {
-          await users.create({
-            name: staff.full_name,
-            number: staff.emp_id,
-            password: staff.emp_id,
-            image: 'https://ent.pakka.ai' + staff.avatar || '',
-            role: 0
-          })
-        }
+        await users.create({
+          name: staff.full_name,
+          number: staff.emp_id,
+          password: staff.emp_id,
+          image: 'https://ent.pakka.ai' + staff.avatar || '',
+          role: 0
+        })
       } catch (error) {
         if (error.name !== 'MongoServerError' || error.code !== 11000) {
-          console.error(error) // log unexpected errors
+          console.error(error) // 如果不是Mongo的重複鍵錯誤，那麼記錄錯誤
         }
-        console.error(error)
-        await new Promise(resolve => setTimeout(resolve, 5000))
-        return getmember()
-        // if it's a MongoDB duplicate key error, just skip and continue with the next staff
+        continue // 跳過當前的員工並繼續處理下一個
       }
     }
   }, 2000)
