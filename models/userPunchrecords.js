@@ -54,7 +54,7 @@ const schema = new Schema(
     break: { type: Boolean, default: false },
     state: {
       type: String,
-      default: '審核中',
+      default: '已審核',
       enum: {
         values: ['審核中', '已審核', '已退回']
       }
@@ -63,7 +63,7 @@ const schema = new Schema(
       type: String,
       default: '早班',
       enum: {
-        values: ['資訊', '早班', '晚班', '人事', 'PT']
+        values: ['資訊', '早班', '晚班', '人事', 'PT', '外籍']
       }
     }
   },
