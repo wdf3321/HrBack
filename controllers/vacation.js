@@ -11,6 +11,7 @@ const year = today.year
 const month = today.month.toString().padStart(2, '0')
 // const day = today.day
 // ----------------------------------------------
+// 補上班
 export const createVacation = async (req, res) => {
   const find = await userPunchrecords.findOne({ day: req.body.day, month: req.body.month, number: req.body.number })
   const finduser = await users.findOne({ number: req.body.number })
@@ -21,14 +22,14 @@ export const createVacation = async (req, res) => {
       const result = await userPunchrecords.create({
         name: finduser.name,
         number: req.body.number,
-        onClockIn: req.body.onClockIn,
-        onClockOut: req.body.onClockOut,
-        editClockIn: req.body.onClockIn,
-        editClockOut: req.body.onClockIn,
+        onClockIn: req.body?.onClockIn,
+        onClockOut: req.body?.onClockOut,
+        editClockIn: req.body?.onClockIn,
+        editClockOut: req.body?.onClockIn,
         year: req.body.year,
         month: req.body.month,
         day: req.body.day,
-        state: req.body.state,
+        state: '已審核',
         hours: req.body.hours,
         team: finduser.team
       })
@@ -42,7 +43,7 @@ export const createVacation = async (req, res) => {
     }
   }
 }
-
+// 補下班
 export const offVacation = async (req, res) => {
   try {
     const find = await userPunchrecords.findOne({ day: req.body.day, month: req.body.month, number: req.body.number, year })
