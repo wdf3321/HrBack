@@ -5,7 +5,7 @@ import cors from 'cors'
 import userRoute from './routes/users.js'
 import workRoute from './routes/work.js'
 import workScheduleRoute from './routes/workSchudule.js'
-import pakkaRoute from './routes/pakka.js'
+// import pakkaRoute from './routes/pakka.js'
 import overhourRoute from './routes/overhour.js'
 import './passport/passport.js'
 import { fileURLToPath } from 'url'
@@ -45,7 +45,7 @@ app.use((_, req, res, next) => {
 app.use('/users', userRoute)
 app.use('/work', workRoute)
 app.use('/workschedule', workScheduleRoute)
-app.use('/pakka', pakkaRoute)
+// app.use('/pakka', pakkaRoute)
 app.use('/overhour', overhourRoute)
 
 app.get('/download/workschedule', (req, res) => {
