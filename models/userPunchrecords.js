@@ -52,6 +52,9 @@ const schema = new Schema(
       default: false
     },
     break: { type: Boolean, default: false },
+    overhourfirst: { type: String, default: false },
+    overhoursecond: { type: String, default: false },
+    overhourthird: { type: String, default: false },
     state: {
       type: String,
       default: '已審核',
