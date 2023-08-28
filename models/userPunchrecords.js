@@ -52,9 +52,9 @@ const schema = new Schema(
       default: false
     },
     break: { type: Boolean, default: false },
-    overhourfirst: { type: String, default: false },
-    overhoursecond: { type: String, default: false },
-    overhourthird: { type: String, default: false },
+    overhourfirst: { type: String, default: '' },
+    overhoursecond: { type: String, default: '' },
+    overhourthird: { type: String, default: '' },
     state: {
       type: String,
       default: '已審核',
@@ -68,9 +68,23 @@ const schema = new Schema(
       enum: {
         values: ['資訊', '早班', '晚班', '人事', 'PT', '外籍']
       }
-    }
+    },
+    updates: [
+      {
+        updatedAt: Date,
+        updatedBy: String
+      }
+    ]
   },
   { versionKey: false }
 )
-
+schema.pre('save', function (req, res, next) {
+  const user = this
+  // check if the document is new or a new password has been set
+  user.updates.push({
+    updatedAt: new Date(),
+    updatedBy: req.user.name // you can change this to the actual user
+  })
+  next()
+})
 export default model('userPunchrecords', schema)

@@ -250,11 +250,23 @@ export const editVacation = async (req, res) => {
     // ------------------------------------------------
     const results = await userPunchrecords.findOneAndUpdate(
       { _id: req.body._id },
-      { hours: HourSent, break: req.body.breakday, holiday: req.body.holiday },
+      {
+        hours: HourSent,
+        break: req.body.breakday,
+        holiday: req.body.holiday,
+        overhourfirst: req.body.overhourfirst,
+        overhoursecond: req.body.overhoursecond,
+        overhourthird: req.body.overhourthird,
+        $push: {
+          updates: {
+            updatedAt: today,
+            updatedBy: req.user.name
+          }
+        }
+      },
       { new: true }
     )
-
-    res.status(200).json({ success: true, message: result, results })
+    res.status(200).json({ success: true, message: results })
   } catch (error) {
     res.status(500).json({ success: false, message: error.message })
   }
