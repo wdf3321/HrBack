@@ -5,8 +5,8 @@ const today = DateTime.now()
 const schema = new Schema(
   {
     name: {
-      type: String
-      // required: [true, '請輸入姓名']
+      type: String,
+      required: [true, '請輸入姓名']
     },
     number: {
       type: String,
@@ -27,19 +27,11 @@ const schema = new Schema(
       default: today.day
       // required: [true, '請輸入日']
     },
-    onClockIn: {
+    ClockIn: {
       type: String,
       default: ''
     },
-    onClockOut: {
-      type: String,
-      default: ''
-    },
-    editClockIn: {
-      type: String,
-      default: ''
-    },
-    editClockOut: {
+    ClockOut: {
       type: String,
       default: ''
     },
@@ -47,14 +39,6 @@ const schema = new Schema(
       type: String,
       default: 0
     },
-    holiday: {
-      type: Boolean,
-      default: false
-    },
-    break: { type: Boolean, default: false },
-    overhourfirst: { type: String, default: '' },
-    overhoursecond: { type: String, default: '' },
-    overhourthird: { type: String, default: '' },
     state: {
       type: String,
       default: '已審核',
@@ -66,7 +50,7 @@ const schema = new Schema(
       type: String,
       default: '早班',
       enum: {
-        values: ['資訊', '早班', '晚班', '人事', 'PT', '外籍']
+        values: ['早班', '晚班', '人事', 'PT', '外籍', '責任制']
       }
     },
     updates: [
@@ -86,4 +70,4 @@ schema.pre('save', function (next) {
   })
   next()
 })
-export default model('userPunchrecords', schema)
+export default model('leaveRecord', schema)

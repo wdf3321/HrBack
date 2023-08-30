@@ -38,7 +38,8 @@ const schema = new Schema(
       type: String,
       default: '早班',
       enum: {
-        values: ['早班', '晚班', '人事', 'PT', '外籍']
+        values: ['早班', '晚班', '人事', 'PT', '外籍', '責任制']
+        // 早班固定加1.5 晚班固定加2
       }
     },
     // 到職年月日

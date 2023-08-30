@@ -7,6 +7,7 @@ import workRoute from './routes/work.js'
 import workScheduleRoute from './routes/workSchudule.js'
 // import pakkaRoute from './routes/pakka.js'
 import overhourRoute from './routes/overhour.js'
+import leaveRoute from './routes/leave.js'
 import './passport/passport.js'
 import { fileURLToPath } from 'url'
 import { dirname, join } from 'path'
@@ -47,6 +48,7 @@ app.use('/work', workRoute)
 app.use('/workschedule', workScheduleRoute)
 // app.use('/pakka', pakkaRoute)
 app.use('/overhour', overhourRoute)
+app.use('/leave', leaveRoute)
 
 app.get('/download/workschedule', (req, res) => {
   const file = join(__dirname, './workschedule.csv') // 使用path.join來建立路徑
@@ -57,7 +59,7 @@ app.get('/download/work', (req, res) => {
   res.download(file) // 讓用戶端下載這個檔案
 })
 app.all('*', (req, res) => {
-  res.status(404).json({ success: false, message: '找不到' })
+  res.status(404).json({ success: false, message: 'Not found' })
 })
 
 app.listen(process.env.PORT || 4000, () => {

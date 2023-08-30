@@ -15,22 +15,23 @@ const month = today.month.toString().padStart(2, '0')
 export const createVacation = async (req, res) => {
   const find = await userPunchrecords.findOne({ day: req.body.day, month: req.body.month, number: req.body.number })
   const finduser = await users.findOne({ number: req.body.number })
+
   if (find) {
-    res.status(500).json({ success: false, message: '你今天已打過卡' })
+    res.status(400).json({ success: false, message: '你今天已打過卡' })
   } else {
     try {
       const result = await userPunchrecords.create({
         name: finduser.name,
         number: req.body.number,
-        onClockIn: req.body?.onClockIn,
+        onClockIn: req.body?.time,
         onClockOut: req.body?.onClockOut,
-        editClockIn: req.body?.onClockIn,
+        editClockIn: req.body?.time,
         editClockOut: req.body?.onClockIn,
         year: req.body.year,
         month: req.body.month,
         day: req.body.day,
         state: '已審核',
-        hours: req.body.hours,
+        hours: req.body?.hours,
         team: finduser.team
       })
       res.status(200).json({ success: true, data: result })
@@ -39,6 +40,7 @@ export const createVacation = async (req, res) => {
         res.status(400).json({ success: false, message: error.errors[Object.keys(error.errors)[0]].message })
       } else {
         res.status(500).json({ success: false, message: error.message })
+        console.log(error)
       }
     }
   }
@@ -47,11 +49,42 @@ export const createVacation = async (req, res) => {
 export const offVacation = async (req, res) => {
   try {
     const find = await userPunchrecords.findOne({ day: req.body.day, month: req.body.month, number: req.body.number, year })
+    console.log(find)
+    if (!find) {
+      try {
+        const finduser = await users.findOne({ number: req.body.number })
+        const result = await userPunchrecords.create({
+          name: finduser.name,
+          number: req.body.number,
+          onClockIn: req.body?.onClockOut,
+          onClockOut: req.body?.time,
+          editClockIn: req.body?.onClockIn,
+          editClockOut: req.body?.time,
+          year: req.body.year,
+          month: req.body.month,
+          day: req.body.day,
+          state: '已審核',
+          hours: req.body?.hours,
+          team: finduser.team
+        })
+        res.status(200).json({ success: true, data: result })
+      } catch (error) {
+        if (error.name === 'ValidationError') {
+          res.status(400).json({ success: false, message: error.errors[Object.keys(error.errors)[0]].message })
+        } else {
+          res.status(500).json({ success: false, message: error.message })
+          console.log(error)
+        }
+      }
+      return
+    }
     const day = parseInt(req.body.day)
     const month = parseInt(req.body.month)
     const startTimeString = await find.onClockIn
-    const endTimeString = await req.body.onClockOut
+    const endTimeString = await req.body.time
     // const formatString = 'HH:mm'
+    console.log('startTimeString:', startTimeString)
+    console.log('endTimeString:', endTimeString)
 
     const startTime = DateTime.fromObject({
       year,
@@ -97,7 +130,7 @@ export const offVacation = async (req, res) => {
     // ------------------------------------------------
     const result = await userPunchrecords.findOneAndUpdate(
       { day: req.body.day, month: req.body.month, number: req.body.number },
-      { hours: HourSent, onClockOut: req.body.onClockOut },
+      { hours: HourSent, onClockOut: req.body.time, editClockOut: req.body.time },
       { new: true }
     )
     res.status(200).json({ success: true, data: result })
