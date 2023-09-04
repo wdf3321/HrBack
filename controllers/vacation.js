@@ -253,7 +253,9 @@ export const editVacation = async (req, res) => {
     if (req.body.breaktime === true) {
       endTime = endTime.minus({ hours: 1 })
     }
-
+    if (req.body.breaktimehalf === true) {
+      endTime = endTime.minus({ minutes: 30 })
+    }
     let hours = 0
     let minutes = 0
 
