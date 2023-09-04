@@ -14,7 +14,8 @@ import {
   deleteUser,
   editUserAdmin,
   findUserVacation,
-  getTeam
+  getTeam,
+  getUserAdmin
 } from '../controllers/users.js'
 // --------------------------------------------
 
@@ -29,6 +30,7 @@ router.delete('/logout', auth.jwt, logout)
 router.patch('/extend', auth.jwt, extend)
 // 獲取使用者
 router.get('/me', auth.jwt, getUser)
+router.get('/admin/:number', auth.jwt, getUserAdmin)
 // get team enum
 router.get('/team', getTeam)
 

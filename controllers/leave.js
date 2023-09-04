@@ -35,3 +35,33 @@ export const createLeave = async (req, res) => {
     }
   }
 }
+
+export const findLeave = async (req, res) => {
+  try {
+    const result = await leave.find({ number: req.body.number, year: today.year, month: req.params.month })
+    res.status(200).json({ success: true, data: result })
+  } catch (error) {
+    res.status(500).json({ success: false, data: error.message })
+    console.log(error)
+  }
+}
+
+export const editLeave = async (req, res) => {
+  try {
+    const result = await leave.findOneAndUpdate({ _id: req.body._id }, {
+      name: req.body?.name,
+      number: req.body.number,
+      ClockIn: req.body?.ClockIn,
+      ClockOut: req.body?.ClockOut,
+      year: req.body.year,
+      month: req.body.month,
+      day: req.body.day,
+      state: '已審核',
+      hours: req.body?.hours
+    })
+    res.status(200).json({ success: true, data: result })
+  } catch (error) {
+    res.status(500).json({ success: false, data: error.message })
+    console.log(error)
+  }
+}

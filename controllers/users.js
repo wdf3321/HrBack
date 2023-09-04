@@ -94,7 +94,17 @@ export const getUser = (req, res) => {
     res.status(500).json({ success: false, message: error.message })
   }
 }
-
+export const getUserAdmin = async (req, res) => {
+  try {
+    const result = await users.findOne({ number: req.params.number })
+    res.status(200).json({
+      success: true,
+      data: result
+    })
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message })
+  }
+}
 export const getTeam = async (req, res) => {
   const teamEnumValues = users.schema.path('team').enumValues
   res.json(teamEnumValues)
