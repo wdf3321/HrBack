@@ -8,6 +8,7 @@ import workScheduleRoute from './routes/workSchudule.js'
 // import pakkaRoute from './routes/pakka.js'
 import overhourRoute from './routes/overhour.js'
 import leaveRoute from './routes/leave.js'
+import dutyDaysRoute from './routes/dutyDays.js'
 import './passport/passport.js'
 import { fileURLToPath } from 'url'
 import { dirname, join } from 'path'
@@ -49,6 +50,7 @@ app.use('/workschedule', workScheduleRoute)
 // app.use('/pakka', pakkaRoute)
 app.use('/overhour', overhourRoute)
 app.use('/leave', leaveRoute)
+app.use('/dutydays', dutyDaysRoute)
 
 app.get('/download/workschedule', (req, res) => {
   const file = join(__dirname, './workschedule.csv') // 使用path.join來建立路徑

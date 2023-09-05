@@ -55,7 +55,7 @@ const schema = new Schema(
     overhoursecond: {
       type: String
     },
-    overhourthree: {
+    overhourthird: {
       type: String
     },
     state: {
