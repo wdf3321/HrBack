@@ -17,7 +17,8 @@ export const createVacation = async (req, res) => {
   const finduser = await users.findOne({ number: req.body.number })
 
   if (find) {
-    res.status(400).json({ success: false, message: '你今天已打過卡' })
+    const result = await userPunchrecords.findOneAndUpdate({ _id: find._id }, { onClockIn: req.body.time, editClockIn: req.body.time }, { new: true })
+    res.status(200).json({ success: false, data: result })
   } else {
     try {
       const result = await userPunchrecords.create({
@@ -292,7 +293,7 @@ export const editVacation = async (req, res) => {
         overhourfirst: req.body.overhourfirst,
         overhoursecond: req.body.overhoursecond,
         overhourthird: req.body.overhourthird,
-        late:req.body.late,
+        late: req.body.late,
         $push: {
           updates: {
             updatedAt: today,
