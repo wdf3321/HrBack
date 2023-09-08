@@ -18,21 +18,20 @@ export const createVacation = async (req, res) => {
 
   if (find) {
     const result = await userPunchrecords.findOneAndUpdate({ _id: find._id }, { onClockIn: req.body.time, editClockIn: req.body.time }, { new: true })
-    res.status(200).json({ success: false, data: result })
+    res.status(200).json({ success: true, data: result })
   } else {
     try {
       const result = await userPunchrecords.create({
         name: finduser.name,
         number: req.body.number,
         onClockIn: req.body?.time,
-        onClockOut: req.body?.onClockOut,
-        editClockIn: req.body?.time,
-        editClockOut: req.body?.onClockIn,
+        editClockIn: roundTimeIn(req.body?.time),
         year: req.body.year,
         month: req.body.month,
         day: req.body.day,
         state: '已審核',
         hours: req.body?.hours,
+        late: req.body?.late || '0',
         team: finduser.team
       })
       res.status(200).json({ success: true, data: result })
@@ -50,7 +49,6 @@ export const createVacation = async (req, res) => {
 export const offVacation = async (req, res) => {
   try {
     const find = await userPunchrecords.findOne({ day: req.body.day, month: req.body.month, number: req.body.number, year })
-    console.log(find)
     if (!find) {
       try {
         const finduser = await users.findOne({ number: req.body.number })
@@ -81,12 +79,9 @@ export const offVacation = async (req, res) => {
     }
     const day = parseInt(req.body.day)
     const month = parseInt(req.body.month)
-    const startTimeString = await find.onClockIn
+    const startTimeString = await find.editClockIn
     const endTimeString = await req.body.time
     // const formatString = 'HH:mm'
-    console.log('startTimeString:', startTimeString)
-    console.log('endTimeString:', endTimeString)
-
     const startTime = DateTime.fromObject({
       year,
       month,
@@ -101,10 +96,8 @@ export const offVacation = async (req, res) => {
       hour: parseInt(endTimeString.split(':')[0]),
       minute: parseInt(endTimeString.split(':')[1])
     })
-
     let hours = 0
     let minutes = 0
-
     if (endTime < startTime) {
       // 跨天情況
       const midnight = DateTime.fromISO('00:00', { zone: 'utc' }).setZone('Asia/Taipei')
@@ -482,3 +475,26 @@ export const csvtowork = async (req, res) => {
 }
 
 // ----------------------------------------------------------------
+const roundTimeIn = timeStr => {
+  let [hours, minutes] = timeStr.split(':').map(Number)
+
+  if (minutes > 5 && minutes <= 30) {
+    minutes = 30
+  } else if (minutes > 30) {
+    minutes = 0
+    hours++
+  }
+
+  return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`
+}
+//  下班時間至00 30
+const roundTimeOut = timeStr => {
+  let [hours, minutes] = timeStr.split(':').map(Number)
+  if (minutes > 0 && minutes < 30) {
+    minutes = 0
+  } else if (minutes >= 30) {
+    minutes = 30
+  }
+
+  return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`
+}

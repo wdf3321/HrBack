@@ -75,7 +75,8 @@ const schema = new Schema(
         updatedAt: Date,
         updatedBy: String
       }
-    ]
+    ],
+    remark: { type: String, default: '' }
   },
   { versionKey: false }
 )

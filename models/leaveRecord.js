@@ -39,6 +39,7 @@ const schema = new Schema(
       type: String,
       default: 0
     },
+    punchtype: { type: String, default: '未填寫', required: [true, '請輸入假別'] },
     state: {
       type: String,
       default: '已審核',

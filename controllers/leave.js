@@ -5,6 +5,7 @@ import users from '../models/users.js'
 const today = DateTime.now()
 // ----------------------------------------------------------------
 export const createLeave = async (req, res) => {
+  console.log(req.body)
   const find = await leave.findOne({ day: req.body.day, month: req.body.month, number: req.body.number })
   const finduser = await users.findOne({ number: req.body.number })
 
@@ -38,7 +39,7 @@ export const createLeave = async (req, res) => {
 
 export const findLeave = async (req, res) => {
   try {
-    const result = await leave.find({ number: req.body.number, year: today.year, month: req.params.month })
+    const result = await leave.find({ number: req.params.number, year: today.year, month: req.params.month })
     res.status(200).json({ success: true, data: result })
   } catch (error) {
     res.status(500).json({ success: false, data: error.message })
@@ -51,17 +52,42 @@ export const editLeave = async (req, res) => {
     const result = await leave.findOneAndUpdate({ _id: req.body._id }, {
       name: req.body?.name,
       number: req.body.number,
-      ClockIn: req.body?.ClockIn,
-      ClockOut: req.body?.ClockOut,
+      ClockIn: req.body?.editClockIn,
+      ClockOut: req.body?.editClockOut,
       year: req.body.year,
       month: req.body.month,
       day: req.body.day,
       state: '已審核',
-      hours: req.body?.hours
+      hours: req.body?.hours,
+      punchtype: req.body?.punchtype
     })
     res.status(200).json({ success: true, data: result })
   } catch (error) {
     res.status(500).json({ success: false, data: error.message })
     console.log(error)
   }
+}
+
+const roundTimeIn = timeStr => {
+  let [hours, minutes] = timeStr.split(':').map(Number)
+
+  if (minutes > 5 && minutes <= 30) {
+    minutes = 30
+  } else if (minutes > 30) {
+    minutes = 0
+    hours++
+  }
+
+  return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`
+}
+//  下班時間至00 30
+const roundTimeOut = timeStr => {
+  let [hours, minutes] = timeStr.split(':').map(Number)
+  if (minutes > 0 && minutes < 30) {
+    minutes = 0
+  } else if (minutes >= 30) {
+    minutes = 30
+  }
+
+  return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`
 }
