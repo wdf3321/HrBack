@@ -3,7 +3,7 @@ import admin from '../middleware/admin.js'
 // import content from '../middleware/content.js'
 import * as auth from '../middleware/auth.js'
 import { upload } from '../middleware/multer.js'
-import { createWorkschudule, findAllSchudule, findAllSchuduleByMonth, findAllSchuduleByYear, findSchudule, findSchuduleByMonth, findSchuduleByYear, csvtowork } from '../controllers/workSchudule.js'
+import { createWorkschudule, findAllSchudule, findAllSchuduleByMonth, findAllSchuduleByYear, findSchudule, findSchuduleByMonth, findSchuduleByYear, csvtowork, deleteWorkschudule } from '../controllers/workSchudule.js'
 
 const router = Router()
 // 創立打卡紀錄
@@ -17,6 +17,7 @@ router.post('/month/:number', auth.jwt, findSchuduleByMonth)
 router.post('/year/:number', auth.jwt, findSchuduleByYear)
 // csv導入班表
 router.post('/csvtowork', upload, csvtowork)
+router.delete('/delete/:id', auth.jwt, deleteWorkschudule)
 // // 更改打卡已審核未審核
 // router.patch('/check', auth.jwt, checkVacation)
 // // 當月總時長

@@ -18,7 +18,7 @@ export const createWorkschudule = async (req, res) => {
         year: req.body.year,
         month: req.body.month,
         day: req.body.day,
-        hours: req.body.hours,
+        hours: req.body?.hours,
         team: req.body.team
       })
       res.status(200).json({ success: true, data: result })
@@ -39,7 +39,7 @@ export const findSchudule = async (req, res) => {
 }
 export const findSchuduleByMonth = async (req, res) => {
   const result = await workschedule.find({ month: req.body.month, year: req.body.year, number: req.params.number })
-  res.status(200).json({ success: true, message: result })
+  res.status(200).json({ success: true, data: result })
 }
 export const findSchuduleByYear = async (req, res) => {
   const result = await workschedule.find({ year: req.body.year, number: req.params.number })
@@ -57,7 +57,11 @@ export const findAllSchuduleByYear = async (req, res) => {
   const result = await workschedule.find({ year: req.params.year })
   res.status(200).json({ success: true, message: result })
 }
-
+export const deleteWorkschudule = async (req, res) => {
+  const result = await workschedule.findOneAndDelete({ _id: req.params.id })
+  res.status(200).json({ success: true, data: result })
+}
+// -----------------------------------------------------------------
 export const csvtowork = async (req, res) => {
   const csvFilePath = req.file.path
   console.log(req.file.path)
