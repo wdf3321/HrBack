@@ -32,7 +32,7 @@ schema.pre('save', function (next) {
   const user = this
   user.updates.push({
     updatedAt: new Date(),
-    updatedBy: 'admin' // you can change this to the actual user
+    updatedBy: user.name || 'admin' // you can change this to the actual user
   })
   next()
 })

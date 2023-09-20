@@ -1,12 +1,14 @@
 import { DateTime } from 'luxon'
 import leave from '../models/leaveRecord.js'
 import users from '../models/users.js'
+import userPunchrecords from '../models/userPunchrecords.js'
 
 const today = DateTime.now()
+const year = today.year
 // ----------------------------------------------------------------
 export const createLeave = async (req, res) => {
   console.log(req.body)
-  const find = await leave.findOne({ day: req.body.day, month: req.body.month, number: req.body.number })
+  const find = await leave.findOne({ day: req.body.day, month: req.body.month, number: req.body.number, year })
   const finduser = await users.findOne({ number: req.body.number })
 
   if (find) {
@@ -26,6 +28,9 @@ export const createLeave = async (req, res) => {
         team: finduser.team
       })
       res.status(200).json({ success: true, data: result })
+      // 找打卡紀錄清除遲到紀錄
+      const findpunch = await userPunchrecords.findOneAndUpdate({ day: req.body.day, month: req.body.month, number: req.body.number, year }, { late: 0, lateEdit: true }, { new: true })
+      console.log(findpunch)
     } catch (error) {
       if (error.name === 'ValidationError') {
         res.status(400).json({ success: false, message: error.errors[Object.keys(error.errors)[0]].message })
@@ -61,7 +66,9 @@ export const editLeave = async (req, res) => {
       hours: req.body?.hours,
       punchtype: req.body?.punchtype
     })
-    res.status(200).json({ success: true, data: result })
+    const findpunch = await userPunchrecords.findOneAndUpdate({ day: req.body.day, month: req.body.month, number: req.body.number, year }, { late: 0, lateEdit: true }, { new: true })
+    console.log(findpunch)
+    res.status(200).json({ success: true, data: result, findpunch })
   } catch (error) {
     res.status(500).json({ success: false, data: error.message })
     console.log(error)

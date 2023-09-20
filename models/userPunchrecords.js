@@ -1,7 +1,7 @@
 import { Schema, model } from 'mongoose'
 import { DateTime } from 'luxon'
 
-const today = DateTime.now()
+const today = DateTime.now().toFormat('yyyy-MM-dd HH:mm:ss')
 const schema = new Schema(
   {
     name: {
@@ -39,10 +39,12 @@ const schema = new Schema(
       type: String,
       default: ''
     },
+    editClockInStatus: { type: Boolean, default: false },
     editClockOut: {
       type: String,
       default: ''
     },
+    editClockOutStatus: { type: Boolean, default: false },
     hours: {
       type: String,
       default: 0
@@ -52,10 +54,11 @@ const schema = new Schema(
       default: false
     },
     break: { type: Boolean, default: false },
-    overhourfirst: { type: String, default: '' },
-    overhoursecond: { type: String, default: '' },
-    overhourthird: { type: String, default: '' },
-    late: { type: String, default: false },
+    overhourfirst: { type: String, default: 0 },
+    overhoursecond: { type: String, default: 0 },
+    overhourthird: { type: String, default: 0 },
+    late: { type: Number, default: 0 },
+    lateEdit: { type: Boolean, default: false },
     state: {
       type: String,
       default: '已審核',
@@ -82,10 +85,23 @@ const schema = new Schema(
 )
 schema.pre('save', function (next) {
   const user = this
+  console.log('user', user)
   user.updates.push({
-    updatedAt: new Date(),
-    updatedBy: 'admin' // you can change this to the actual user
+    updatedAt: today,
+    updatedBy: user.name || '補打卡' // you can change this to the actual user
   })
   next()
 })
+
+// schema.pre('findOneAndUpdate', function (next) {
+//   const updateData = this.getUpdate()
+//   console.log('updateData', updateData)
+//   updateData.$push = {
+//     updates: {
+//       updatedAt: today, // 使用當前日期
+//       updatedBy: updateData?.name
+//     }
+//   }
+//   next()
+// })
 export default model('userPunchrecords', schema)

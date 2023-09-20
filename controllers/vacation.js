@@ -17,10 +17,11 @@ export const createVacation = async (req, res) => {
   const finduser = await users.findOne({ number: req.body.number })
 
   if (find) {
-    const result = await userPunchrecords.findOneAndUpdate({ _id: find._id }, { onClockIn: req.body.time, editClockIn: req.body.time }, { new: true })
+    const result = await userPunchrecords.findOneAndUpdate({ _id: find._id }, { onClockIn: req.body.time, editClockIn: req.body.time, editClockInStatus: true }, { new: true })
     res.status(200).json({ success: true, data: result })
   } else {
     try {
+      console.log(req.user)
       const result = await userPunchrecords.create({
         name: finduser.name,
         number: req.body.number,
@@ -32,7 +33,9 @@ export const createVacation = async (req, res) => {
         state: '已審核',
         hours: req.body?.hours,
         late: req.body?.late || '0',
-        team: finduser.team
+        team: finduser.team,
+        editClockInStatus: true,
+        $push: { updates: { updatedAt: today, updatedBy: req.user?.name || '補打卡' } }
       })
       res.status(200).json({ success: true, data: result })
     } catch (error) {
@@ -49,11 +52,12 @@ export const createVacation = async (req, res) => {
 export const offVacation = async (req, res) => {
   try {
     const find = await userPunchrecords.findOne({ day: req.body.day, month: req.body.month, number: req.body.number, year })
+    console.log(find)
     if (!find) {
       try {
         const finduser = await users.findOne({ number: req.body.number })
         const result = await userPunchrecords.create({
-          name: finduser.name,
+          name: req.body.name,
           number: req.body.number,
           onClockIn: req.body?.onClockOut,
           onClockOut: req.body?.time,
@@ -64,7 +68,10 @@ export const offVacation = async (req, res) => {
           day: req.body.day,
           state: '已審核',
           hours: req.body?.hours,
-          team: finduser.team
+          team: finduser.team,
+          editClockOutStatus: true,
+          $push: { updates: { updatedAt: today, updatedBy: req.user?.name || '補打卡' } }
+
         })
         res.status(200).json({ success: true, data: result })
       } catch (error) {
@@ -123,8 +130,14 @@ export const offVacation = async (req, res) => {
 
     // ------------------------------------------------
     const result = await userPunchrecords.findOneAndUpdate(
-      { day: req.body.day, month: req.body.month, number: req.body.number },
-      { hours: HourSent, onClockOut: req.body.time, editClockOut: req.body.time },
+      { day: req.body.day, month: req.body.month, number: req.body.number, year },
+      {
+        hours: HourSent,
+        onClockOut: req.body.time,
+        editClockOut: req.body.time,
+        editClockOutStatus: true,
+        $push: { updates: { updatedAt: today, updatedBy: req.user?.name || '補打卡' } }
+      },
       { new: true }
     )
     res.status(200).json({ success: true, data: result })
@@ -217,9 +230,12 @@ export const UserTotalWorkTimeByMonth = async (req, res) => {
 
 export const editVacation = async (req, res) => {
   try {
-    const result = await userPunchrecords.findByIdAndUpdate(
+    await userPunchrecords.findByIdAndUpdate(
       req.body._id,
-      { editClockIn: req.body.editClockIn, editClockOut: req.body.editClockOut },
+      {
+        editClockIn: req.body.editClockIn,
+        editClockOut: req.body.editClockOut
+      },
       { new: true }
     )
     const find = await userPunchrecords.findOne({ _id: req.body._id })

@@ -56,7 +56,7 @@ const schema = new Schema(
     },
     updates: [
       {
-        updatedAt: Date,
+        updatedAt: String,
         updatedBy: String
       }
     ]
@@ -66,8 +66,8 @@ const schema = new Schema(
 schema.pre('save', function (next) {
   const user = this
   user.updates.push({
-    updatedAt: new Date(),
-    updatedBy: 'admin' // you can change this to the actual user
+    updatedAt: today,
+    updatedBy: user.name || 'admin' // you can change this to the actual user
   })
   next()
 })
