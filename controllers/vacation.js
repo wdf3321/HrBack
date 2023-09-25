@@ -17,7 +17,7 @@ export const createVacation = async (req, res) => {
   const finduser = await users.findOne({ number: req.body.number })
 
   if (find) {
-    const result = await userPunchrecords.findOneAndUpdate({ _id: find._id }, { onClockIn: req.body.time, editClockIn: req.body.time, editClockInStatus: true }, { new: true })
+    const result = await userPunchrecords.findOneAndUpdate({ _id: find._id }, { onClockIn: req.body.time, editClockIn: req.body.time, editClockInStatus: true, remark: req.body?.remark }, { new: true })
     res.status(200).json({ success: true, data: result })
   } else {
     try {
@@ -34,6 +34,7 @@ export const createVacation = async (req, res) => {
         hours: req.body?.hours,
         late: req.body?.late || '0',
         team: finduser.team,
+        remark: req.body?.remark,
         editClockInStatus: true,
         $push: { updates: { updatedAt: today, updatedBy: req.user?.name || '補打卡' } }
       })
@@ -69,6 +70,7 @@ export const offVacation = async (req, res) => {
           state: '已審核',
           hours: req.body?.hours,
           team: finduser.team,
+          remark: req.body?.remark,
           editClockOutStatus: true,
           $push: { updates: { updatedAt: today, updatedBy: req.user?.name || '補打卡' } }
 
@@ -136,6 +138,7 @@ export const offVacation = async (req, res) => {
         onClockOut: req.body.time,
         editClockOut: req.body.time,
         editClockOutStatus: true,
+        remark: req.body?.remark,
         $push: { updates: { updatedAt: today, updatedBy: req.user?.name || '補打卡' } }
       },
       { new: true }
@@ -234,7 +237,8 @@ export const editVacation = async (req, res) => {
       req.body._id,
       {
         editClockIn: req.body.editClockIn,
-        editClockOut: req.body.editClockOut
+        editClockOut: req.body.editClockOut,
+        remark: req.body?.remark
       },
       { new: true }
     )
