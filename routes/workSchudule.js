@@ -6,9 +6,9 @@ import { upload } from '../middleware/multer.js'
 import { createWorkschudule, findAllSchudule, findAllSchuduleByMonth, findAllSchuduleByYear, findSchudule, findSchuduleByMonth, findSchuduleByYear, csvtowork, deleteWorkschudule } from '../controllers/workSchudule.js'
 
 const router = Router()
-// 創立打卡紀錄
+// 創立班表
 router.post('/add', auth.jwt, createWorkschudule)// 上班
-// 查自己,某人打卡紀錄
+// 查自己,某人班表
 router.get('/all', auth.jwt, admin, findAllSchudule)
 router.get('/month/:month', auth.jwt, findAllSchuduleByMonth)
 router.get('/year/:year', auth.jwt, findAllSchuduleByYear)
