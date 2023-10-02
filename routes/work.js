@@ -7,10 +7,10 @@ import { createVacation, findVacation, findVacationByMonth, findVacationByYear, 
 
 const router = Router()
 // 創立打卡紀錄
-router.post('/on', createVacation)// 上班
-router.patch('/off', offVacation)// 下班
+router.post('/on', admin, createVacation)// 上班
+router.patch('/off', admin, offVacation)// 下班
 // 查自己,某人打卡紀錄
-router.get('/all', auth.jwt, admin, findAllVacation)
+router.get('/all', auth.jwt, findAllVacation)
 router.get('/month/:month', auth.jwt, findAllVacationByMonth)
 router.get('/year/:year', auth.jwt, findAllVacationByYear)
 router.get('/:number', auth.jwt, findVacation)
@@ -18,14 +18,14 @@ router.post('/month/:number', auth.jwt, findVacationByMonth)
 router.post('/monthlength/:number', auth.jwt, findVacationByMonthLength)
 router.post('/year/:number', auth.jwt, findVacationByYear)
 // 更改打卡已審核未審核
-router.patch('/check', auth.jwt, checkVacation)
+router.patch('/check', auth.jwt, admin, checkVacation)
 // 當月總時長
-router.get('/time/:number', auth.jwt, UserTotalWorkTime)
-router.get('/time/:number/:month', auth.jwt, UserTotalWorkTimeByMonth)
+router.get('/time/:number', auth.jwt, admin, UserTotalWorkTime)
+router.get('/time/:number/:month', auth.jwt, admin, UserTotalWorkTimeByMonth)
 // 編輯打卡紀錄
-router.patch('/approve/edittime', auth.jwt, editVacation)
+router.patch('/approve/edittime', auth.jwt, admin, editVacation)
 // csv 匯入
-router.post('/csvtowork', upload, csvtowork)
+router.post('/csvtowork', upload, admin, csvtowork)
 // calculate
 router.get('/calculate/:number/:month', auth.jwt, findtotalwork)
 router.post('/calculate/:number/:month', auth.jwt, calculatetotalwork)

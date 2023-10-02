@@ -30,22 +30,22 @@ router.delete('/logout', auth.jwt, logout)
 router.patch('/extend', auth.jwt, extend)
 // 獲取使用者
 router.get('/me', auth.jwt, getUser)
-router.get('/admin/:number', auth.jwt, getUserAdmin)
+router.get('/admin/:number', auth.jwt, admin, getUserAdmin)
 // get team enum
 router.get('/team', getTeam)
 
 // ------------------admin------------------
 // 獲取全部使用者
-router.get('/all', auth.jwt, admin, getAllUser)
+router.get('/all', auth.jwt, getAllUser)
 router.delete('/delete/:id', auth.jwt, admin, deleteUser)
 // -------------------------------------------
 
 // -------------------------------------------
 router.get('/allvacation', auth.jwt, admin, findAllUserVacation)
-router.get('/vacation/:number', auth.jwt, findUserVacation)
+router.get('/vacation/:number', auth.jwt, admin, findUserVacation)
 
 // 編輯使用者
-router.patch('/:id', content('application/json'), auth.jwt, editUser)
+router.patch('/:id', content('application/json'), auth.jwt, admin, editUser)
 router.patch('/admin/:id', content('application/json'), auth.jwt, admin, editUserAdmin)
 // -------------------------------------------
 // router.post('/vacation/find', auth.jwt, findVacationsByDate)
