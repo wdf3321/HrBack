@@ -21,7 +21,7 @@ import {
 
 const router = Router()
 // 註冊
-router.post('/', content('application/json'), register)
+router.post('/', auth.jwt, admin, register)
 // 登入
 router.post('/login', content('application/json'), auth.login, login)
 // 登出
