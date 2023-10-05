@@ -88,7 +88,7 @@ schema.pre('save', function (next) {
   console.log('user', user)
   user.updates.push({
     updatedAt: today,
-    updatedBy: user.name || '補打卡' // you can change this to the actual user
+    updatedBy: '補打卡' // you can change this to the actual user
   })
   next()
 })
