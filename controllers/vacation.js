@@ -307,6 +307,7 @@ export const editVacation = async (req, res) => {
         overhoursecond: req.body.overhoursecond,
         overhourthird: req.body.overhourthird,
         late: req.body.late,
+        leaveEarly: req.body?.leaveEarly,
         $push: {
           updates: {
             updatedAt: today,
