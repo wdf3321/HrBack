@@ -154,6 +154,11 @@ export const findVacation = async (req, res) => {
   console.log(result)
   res.status(200).json({ success: true, message: '', result })
 }
+export const findVacationAllday = async (req, res) => {
+  const result = await userPunchrecords.find({ year: req.body.year, month: req.body.month, day: req.body.day })
+  console.log(result)
+  res.status(200).json({ success: true, message: '', result })
+}
 export const findVacationByMonth = async (req, res) => {
   const result = await userPunchrecords.find({ month: req.body.month, year: req.body.year, number: req.params.number })
   res.status(200).json({ success: true, message: result })

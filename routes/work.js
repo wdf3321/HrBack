@@ -3,7 +3,7 @@ import admin from '../middleware/admin.js'
 // import content from '../middleware/content.js'
 import * as auth from '../middleware/auth.js'
 import { upload } from '../middleware/multer.js'
-import { createVacation, findVacation, findVacationByMonth, findVacationByYear, findAllVacation, findAllVacationByMonth, findAllVacationByYear, checkVacation, offVacation, UserTotalWorkTime, UserTotalWorkTimeByMonth, editVacation, findVacationByMonthLength, csvtowork, calculatetotalwork, findtotalwork, updateworktime } from '../controllers/vacation.js'
+import { createVacation, findVacation, findVacationByMonth, findVacationByYear, findAllVacation, findAllVacationByMonth, findAllVacationByYear, checkVacation, offVacation, UserTotalWorkTime, UserTotalWorkTimeByMonth, editVacation, findVacationByMonthLength, csvtowork, calculatetotalwork, findtotalwork, updateworktime, findVacationAllday } from '../controllers/vacation.js'
 
 const router = Router()
 // 創立打卡紀錄
@@ -11,6 +11,7 @@ router.post('/on', auth.jwt, admin, createVacation)// 上班
 router.patch('/off', auth.jwt, admin, offVacation)// 下班
 // 查自己,某人打卡紀錄
 router.get('/all', auth.jwt, findAllVacation)
+router.post('/allday', auth.jwt, findVacationAllday)
 router.get('/month/:month', auth.jwt, findAllVacationByMonth)
 router.get('/year/:year', auth.jwt, findAllVacationByYear)
 router.get('/:number', auth.jwt, findVacation)
