@@ -54,11 +54,13 @@ const schema = new Schema(
       default: false
     },
     break: { type: Boolean, default: false },
-    overhourfirst: { type: String, default: 0 },
-    overhoursecond: { type: String, default: 0 },
-    overhourthird: { type: String, default: 0 },
+    overhourfirst: { type: Number, default: 0, max: [2, 'Max 2'] },
+    overhoursecond: { type: Number, default: 0 },
+    overhourthird: { type: Number, default: 0 },
     late: { type: Number, default: 0 },
     lateEdit: { type: Boolean, default: false },
+    leaveEarly: { type: Number, default: 0 },
+    leaveEarlyEdit: { type: Boolean, default: false },
     state: {
       type: String,
       default: '已審核',
@@ -88,7 +90,7 @@ schema.pre('save', function (next) {
   console.log('user', user)
   user.updates.push({
     updatedAt: today,
-    updatedBy: user.name || '補打卡' // you can change this to the actual user
+    updatedBy: '補打卡' // you can change this to the actual user
   })
   next()
 })

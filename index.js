@@ -10,7 +10,9 @@ import overhourRoute from './routes/overhour.js'
 import leaveRoute from './routes/leave.js'
 import dutyDaysRoute from './routes/dutyDays.js'
 import IndeedRoute from './routes/workerIndeed.js'
+import swaggerUi from 'swagger-ui-express'
 import './passport/passport.js'
+import swaggerDocument from './swagger.json' assert { type: 'json' };
 import { fileURLToPath } from 'url'
 import { dirname, join } from 'path'
 dotenv.config({ path: `.env.${process.env.NODE_ENV}` })
@@ -35,6 +37,8 @@ app.use(
 app.get('/', (req, res) => {
   res.status(200).send('OK')
 })
+
+app.use('/api/docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument))
 // 處理跨域錯誤
 app.use((_, req, res, next) => {
   res.status(403).json({ success: false, message: '請求被拒' })

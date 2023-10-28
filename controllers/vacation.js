@@ -28,8 +28,8 @@ export const createVacation = async (req, res) => {
         onClockIn: req.body?.time,
         editClockIn: roundTimeIn(req.body?.time),
         year: req.body.year,
-        month: req.body.month,
-        day: req.body.day,
+        month: req.body.month.toString().padStart(2, '0'),
+        day: req.body.day.toString().padStart(2, '0'),
         state: '已審核',
         hours: req.body?.hours,
         late: req.body?.late || '0',
@@ -65,8 +65,8 @@ export const offVacation = async (req, res) => {
           editClockIn: req.body?.onClockIn,
           editClockOut: req.body?.time,
           year: req.body.year,
-          month: req.body.month,
-          day: req.body.day,
+          month: req.body.month.toString().padStart(2, '0'),
+          day: req.body.day.toString().padStart(2, '0'),
           state: '已審核',
           hours: req.body?.hours,
           team: finduser.team,
@@ -151,6 +151,11 @@ export const offVacation = async (req, res) => {
 
 export const findVacation = async (req, res) => {
   const result = await userPunchrecords.find({ number: req.params.number, month, year })
+  console.log(result)
+  res.status(200).json({ success: true, message: '', result })
+}
+export const findVacationAllday = async (req, res) => {
+  const result = await userPunchrecords.find({ year: req.body.year, month: req.body.month, day: req.body.day })
   console.log(result)
   res.status(200).json({ success: true, message: '', result })
 }
@@ -307,6 +312,7 @@ export const editVacation = async (req, res) => {
         overhoursecond: req.body.overhoursecond,
         overhourthird: req.body.overhourthird,
         late: req.body.late,
+        leaveEarly: req.body?.leaveEarly,
         $push: {
           updates: {
             updatedAt: today,
