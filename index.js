@@ -11,6 +11,7 @@ import leaveRoute from './routes/leave.js'
 import dutyDaysRoute from './routes/dutyDays.js'
 import IndeedRoute from './routes/workerIndeed.js'
 import swaggerUi from 'swagger-ui-express'
+import rateLimit from 'express-rate-limit'
 import './passport/passport.js'
 import swaggerDocument from './swagger.json' assert { type: 'json' };
 import { fileURLToPath } from 'url'
@@ -27,6 +28,11 @@ mongoose.connect(process.env.DB_URL, {
 mongoose.set('sanitizeFilter', true)
 
 const app = express()
+const limiter = rateLimit({
+  windowMs:  60 * 1000, // 限制時間
+  max: 100 // 限制請求數量
+})
+app.use(limiter)
 // 跨域請求設定
 app.use(
   cors({

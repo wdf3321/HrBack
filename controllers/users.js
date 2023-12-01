@@ -139,7 +139,8 @@ export const editUserAdmin = async (req, res) => {
       number: req.body.number,
       name: req.body.name,
       role: req.body.role,
-      team: req.body.team
+      team: req.body.team,
+      depart: req.body.depart
     }
     // 如果 req.body.password 不為空，则添加到 data
     if (req.body.password) {

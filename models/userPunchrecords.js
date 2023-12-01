@@ -54,7 +54,7 @@ const schema = new Schema(
       default: false
     },
     break: { type: Boolean, default: false },
-    overhourfirst: { type: Number, default: 0, max: [2, 'Max 2'] },
+    overhourfirst: { type: Number, default: 0 },
     overhoursecond: { type: Number, default: 0 },
     overhourthird: { type: Number, default: 0 },
     late: { type: Number, default: 0 },
