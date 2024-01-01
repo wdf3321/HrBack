@@ -28,7 +28,7 @@ export const createDutyDays = async (req, res) => {
 
 export const finddutyDays = async (req, res) => {
   try {
-    const result = await dutyDays.find({ year: req.body.year || DateTime.now().year, month: req.params.month })
+    const result = await dutyDays.find({ year: req.params.year || DateTime.now().year, month: req.params.month })
     res.status(200).json({ success: true, data: result })
   } catch (error) {
     console.log(error)

@@ -28,11 +28,11 @@ mongoose.connect(process.env.DB_URL, {
 mongoose.set('sanitizeFilter', true)
 
 const app = express()
-const limiter = rateLimit({
-  windowMs:  60 * 1000, // 限制時間
-  max: 100 // 限制請求數量
-})
-app.use(limiter)
+// const limiter = rateLimit({
+//   windowMs:  60 * 1000, // 限制時間
+//   max: 100 // 限制請求數量
+// })
+// app.use(limiter)
 // 跨域請求設定
 app.use(
   cors({
@@ -77,5 +77,5 @@ app.all('*', (req, res) => {
 })
 
 app.listen(process.env.PORT || 4000, () => {
-  console.log(`Server is running on port ${process.env.PORT || 4000}`)
+  console.log(`Server is running on port ${process.env.PORT || 4000}${process.env.team_name}`)
 })

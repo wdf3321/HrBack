@@ -6,6 +6,6 @@ import admin from '../middleware/admin.js'
 const router = Router()
 
 router.post('/create', auth.jwt, admin, createDutyDays)
-router.get('/find/:month', auth.jwt, finddutyDays)
+router.get('/find/:year/:month', auth.jwt, finddutyDays)
 router.patch('/edit/:month', auth.jwt, admin, editdutyDays)
 export default router
