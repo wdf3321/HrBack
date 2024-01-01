@@ -12,7 +12,7 @@ router.patch('/off', auth.jwt, admin, offVacation)// 下班
 // 查自己,某人打卡紀錄
 router.get('/all', auth.jwt, findAllVacation)
 router.post('/allday', auth.jwt, findVacationAllday)
-router.get('/month/:month', auth.jwt, findAllVacationByMonth)
+router.get('/month/:year/:month', auth.jwt, findAllVacationByMonth)
 router.get('/year/:year', auth.jwt, findAllVacationByYear)
 router.get('/:number', auth.jwt, findVacation)
 router.post('/month/:number', auth.jwt, findVacationByMonth)
