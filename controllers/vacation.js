@@ -132,7 +132,7 @@ export const offVacation = async (req, res) => {
 
     // ------------------------------------------------
     const result = await userPunchrecords.findOneAndUpdate(
-      { day: req.body.day, month: req.body.month, number: req.body.number, year },
+      { day: req.body.day, month: req.body.month, number: req.body.number, year: req.body.year },
       {
         hours: HourSent,
         onClockOut: req.body.time,
