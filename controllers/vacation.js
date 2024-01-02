@@ -52,7 +52,7 @@ export const createVacation = async (req, res) => {
 // 補下班
 export const offVacation = async (req, res) => {
   try {
-    const find = await userPunchrecords.findOne({ day: req.body.day, month: req.body.month, number: req.body.number, year })
+    const find = await userPunchrecords.findOne({ day: req.body.day, month: req.body.month, number: req.body.number, year: req.body.year })
     console.log(find)
     if (!find) {
       try {
