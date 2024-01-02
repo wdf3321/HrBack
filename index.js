@@ -1,4 +1,6 @@
 import dotenv from 'dotenv'
+const envFile = `.env.${process.env.NODE_ENV}`;
+dotenv.config({ path: envFile });
 import express from 'express'
 import mongoose from 'mongoose'
 import cors from 'cors'
@@ -16,8 +18,9 @@ import './passport/passport.js'
 import swaggerDocument from './swagger.json' assert { type: 'json' };
 import { fileURLToPath } from 'url'
 import { dirname, join } from 'path'
-dotenv.config({ path: `.env.${process.env.NODE_ENV}` })
 
+
+// ---------------------------------------------
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = dirname(__filename)
 
@@ -77,5 +80,5 @@ app.all('*', (req, res) => {
 })
 
 app.listen(process.env.PORT || 4000, () => {
-  console.log(`Server is running on port ${process.env.PORT || 4000}${process.env.team_name}`)
+  console.log(`Server is running on port ${process.env.PORT || 4000}${process.env.team_name}${process.env.NODE_ENV}`)
 })
