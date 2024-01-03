@@ -13,7 +13,7 @@ const month = today.month.toString().padStart(2, '0')
 // ----------------------------------------------
 // 補上班
 export const createVacation = async (req, res) => {
-  const find = await userPunchrecords.findOne({ day: req.body.day, month: req.body.month, number: req.body.number })
+  const find = await userPunchrecords.findOne({ day: req.body.day, month: req.body.month, number: req.body.number, year: req.body.year })
   const finduser = await users.findOne({ number: req.body.number })
 
   if (find) {
