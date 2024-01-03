@@ -7,4 +7,4 @@ RUN npm i
 RUN npm i -g forever
 COPY . .
 EXPOSE 4000
-CMD ["forever","index.js","4000"]
+CMD ["npx", "cross-env", "NODE_ENV=production", "forever", "index.js", "4000"]
